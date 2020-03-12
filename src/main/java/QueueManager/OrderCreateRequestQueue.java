@@ -68,7 +68,7 @@ public class OrderCreateRequestQueue {
 	 * @throws OrderCreate404RequestException 
 	 * @throws OrderCreate400RequestException 
 	 * */
-	public Boolean executeRequest() throws OrderCreate400RequestException, OrderCreate404RequestException, RequestException, ExecuteException { //TODO Remember to catch when method called
+	public Boolean executeRequest() throws OrderCreate400RequestException, OrderCreate404RequestException, RequestException, ExecuteException { 
 		OrderRequest requestedOrder = getNext();
 		if(RequestIsValid(requestedOrder)) { // If all the order parameters are valid then create the order.
 			OrderCreateRequest createRequest = new OrderCreateRequest(accountId)

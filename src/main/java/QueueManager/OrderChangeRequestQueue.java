@@ -54,7 +54,7 @@ public class OrderChangeRequestQueue {
 	 * @throws OrderReplace404RequestException 
 	 * @throws OrderReplace400RequestException 
 	 * */
-	public Boolean executeChange() throws OrderReplace400RequestException, OrderReplace404RequestException, RequestException, ExecuteException { //TODO catch these 
+	public Boolean executeChange() throws OrderReplace400RequestException, OrderReplace404RequestException, RequestException, ExecuteException { 
 		HashMap<OrderSpecifier,OrderRequest> theChange = getNext();
 		OrderSpecifier specifier = (OrderSpecifier) theChange.keySet().toArray()[0];
 		OrderRequest order = theChange.get(specifier);
