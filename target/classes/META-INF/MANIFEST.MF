@@ -1,5 +1,9 @@
 Manifest-Version: 1.0
 Built-By: rzemi
 Build-Jdk: 13.0.1
+Class-Path: lib/twitter4j-core-4.0.7.jar lib/v20-3.0.25.jar lib/gson-2.8
+ .2.jar lib/httpclient-4.5.3.jar lib/httpcore-4.4.6.jar lib/commons-logg
+ ing-1.2.jar lib/commons-codec-1.9.jar
+Main-Class: MyTradingBot.Main
 Created-By: Maven Integration for Eclipse
 
