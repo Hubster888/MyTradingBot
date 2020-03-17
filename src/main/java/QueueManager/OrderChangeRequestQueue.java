@@ -1,5 +1,8 @@
 package QueueManager;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -15,6 +18,9 @@ import com.oanda.v20.order.OrderReplaceRequest;
 import com.oanda.v20.order.OrderReplaceResponse;
 import com.oanda.v20.order.OrderRequest;
 import com.oanda.v20.order.OrderSpecifier;
+import com.oanda.v20.trade.Trade;
+import com.oanda.v20.trade.TradeContext;
+import com.oanda.v20.trade.TradeSpecifier;
 import com.oanda.v20.transaction.TransactionID;
 
 import MyTradingBot.MyTradingBot.ConstantValues;
@@ -31,22 +37,22 @@ public class OrderChangeRequestQueue {
 	private static final String url = ConstantValues.getURL();
 	private static final String accessToken = ConstantValues.getAccessToken();
 	private final static Context ctx = new ContextBuilder(url)
-    		.setToken(accessToken)
-    		.setApplication("MyTradingBot")
-    		.build();
-	
+			.setToken(accessToken)
+			.setApplication("MyTradingBot")
+			.build();
+
 	/**
 	 * An empty constructor
 	 * */
 	public OrderChangeRequestQueue() {}
-	
+
 	/**
 	 * @return true if the queue is empty
 	 * */
 	public Boolean isEmpty() {
 		return queueOfChangesForOrders.isEmpty();
 	}
-	
+
 	/**
 	 * @return true if the change is executed correctly
 	 * @throws ExecuteException 
@@ -64,7 +70,12 @@ public class OrderChangeRequestQueue {
 			OrderReplaceResponse response = ctx.order.replace(replaceRequest);
 			TransactionID transactionId = response.getLastTransactionID();
 			if(isEmpty() /*TODO OrderManager.getLatestID == transactionId*/) {
-				addToLog(transactionId);
+				try {
+					addToLog(transactionId);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				sendNotification(transactionId);
 				return true;
 			}else {
@@ -74,7 +85,7 @@ public class OrderChangeRequestQueue {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * @param specifier the order to be replaced
 	 * @param request the order to replace
@@ -87,15 +98,20 @@ public class OrderChangeRequestQueue {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * @param the transactionId of the change
+	 * @throws ExecuteException 
+	 * @throws RequestException 
+	 * @throws IOException 
 	 * */
-	private void addToLog(TransactionID transactionId) {
-		System.out.println("This method is not implemented yet");
-		//TODO implement method
+	private void addToLog(TransactionID transactionId) throws RequestException, ExecuteException, IOException {
+		TradeContext context = new TradeContext(ConstantValues.getCtx());
+		TradeSpecifier specifier = new TradeSpecifier(transactionId);
+		Trade summary = context.get(ConstantValues.getAccountId(), specifier).getTrade();
+		recordClosedTrade(summary);
 	}
-	
+
 	/**
 	 * @param the transactionId of the change
 	 * */
@@ -103,7 +119,7 @@ public class OrderChangeRequestQueue {
 		System.out.println("This method is not implemented");
 		//TODO implement method
 	}
-	
+
 	/**
 	 * @param the Order specifier and order request to add
 	 * @return true if the element is added successfully
@@ -111,11 +127,22 @@ public class OrderChangeRequestQueue {
 	public Boolean addToQueue(HashMap<OrderSpecifier, OrderRequest> hashMapOfSpecifierAndRequest) {
 		return queueOfChangesForOrders.add(hashMapOfSpecifierAndRequest);
 	}
-	
+
 	/**
 	 * @return the next change to be made in the form of a hashMap
 	 * */
 	private HashMap<OrderSpecifier,OrderRequest> getNext(){
 		return queueOfChangesForOrders.poll();
+	}
+
+	public static void recordClosedTrade(Trade trade) throws IOException {
+		File file = new File("C:\\Users\\rzemi\\OneDrive\\Desktop\\TradingBot\\MyTradingBot\\closedTradesStorage.txt");
+		FileWriter fr = new FileWriter(file, true);
+		try {
+			fr.write(trade.toString() + "\n");
+			fr.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

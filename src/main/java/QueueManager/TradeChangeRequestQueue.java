@@ -23,6 +23,11 @@ import com.oanda.v20.transaction.TransactionID;
 
 import MyTradingBot.MyTradingBot.ConstantValues;
 
+/**
+ * This class is used to keep track of all the different trade requests.
+ * The things this calls deals with include trades to cancel, change take profit 
+ * and change stop loss.
+ * */
 public class TradeChangeRequestQueue {
 	private static Queue<TradeSpecifier> tradesToCancel = new LinkedList<TradeSpecifier>();
 	private static Queue<HashMap<TradeSpecifier,Double>> changeTakeProfitQueue = new LinkedList<HashMap<TradeSpecifier,Double>>();
