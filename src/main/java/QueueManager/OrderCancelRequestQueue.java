@@ -13,7 +13,7 @@ import com.oanda.v20.order.OrderCancelResponse;
 import com.oanda.v20.order.OrderSpecifier;
 import com.oanda.v20.transaction.TransactionID;
 
-import MyTradingBot.MyTradingBot.ConstantValues;
+import MyTradingBot.ConstantValues;
 
 /**
  * This class will hold and manage the queue that contains all
@@ -46,7 +46,7 @@ public class OrderCancelRequestQueue {
 	 * @throws RequestException 
 	 * @throws OrderCancel404RequestException 
 	 * */
-	public Boolean executeCancel() throws OrderCancel404RequestException, RequestException, ExecuteException { //TODO catch these
+	public Boolean executeCancel() throws OrderCancel404RequestException, RequestException, ExecuteException { 
 		OrderSpecifier specifier = getNextOrder();
 		if(specifierIsValid(specifier)) {
 			OrderCancelResponse response = ctx.order.cancel(accountId, specifier);

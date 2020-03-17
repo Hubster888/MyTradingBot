@@ -21,8 +21,13 @@ import com.oanda.v20.transaction.StopLossDetails;
 import com.oanda.v20.transaction.TakeProfitDetails;
 import com.oanda.v20.transaction.TransactionID;
 
-import MyTradingBot.MyTradingBot.ConstantValues;
+import MyTradingBot.ConstantValues;
 
+/**
+ * This class is used to keep track of all the different trade requests.
+ * The things this calls deals with include trades to cancel, change take profit 
+ * and change stop loss.
+ * */
 public class TradeChangeRequestQueue {
 	private static Queue<TradeSpecifier> tradesToCancel = new LinkedList<TradeSpecifier>();
 	private static Queue<HashMap<TradeSpecifier,Double>> changeTakeProfitQueue = new LinkedList<HashMap<TradeSpecifier,Double>>();
@@ -119,7 +124,7 @@ public class TradeChangeRequestQueue {
 	 * @throws TradeClose404RequestException 
 	 * @throws TradeClose400RequestException 
 	 * */
-	public Boolean executeCancel() throws TradeClose400RequestException, TradeClose404RequestException, RequestException, ExecuteException { //TODO catch these
+	public Boolean executeCancel() throws TradeClose400RequestException, TradeClose404RequestException, RequestException, ExecuteException {
 		TradeSpecifier specifier =  getNextCancel();
 		if(tradeSpecifierIsValid(specifier)) {
 			TradeCloseRequest request = new TradeCloseRequest(accountId, specifier);
@@ -142,7 +147,7 @@ public class TradeChangeRequestQueue {
 	 * @throws RequestException 
 	 * @throws TradeSetDependentOrders400RequestException 
 	 * */
-	public Boolean executeStopLoss() throws TradeSetDependentOrders400RequestException, RequestException, ExecuteException { //TODO catch these
+	public Boolean executeStopLoss() throws TradeSetDependentOrders400RequestException, RequestException, ExecuteException { 
 		HashMap<TradeSpecifier,Double> map = getNextStopLoss();
 		TradeSpecifier specifier = (TradeSpecifier) map.keySet().toArray()[0];
 		Double price = map.get(specifier);
@@ -171,7 +176,7 @@ public class TradeChangeRequestQueue {
 	 * @throws RequestException 
 	 * @throws TradeSetDependentOrders400RequestException 
 	 * */
-	public Boolean executeTakeProfit() throws TradeSetDependentOrders400RequestException, RequestException, ExecuteException { //TODO catch these
+	public Boolean executeTakeProfit() throws TradeSetDependentOrders400RequestException, RequestException, ExecuteException { 
 		HashMap<TradeSpecifier,Double> map = getNextTakeProfit();
 		TradeSpecifier specifier = (TradeSpecifier) map.keySet().toArray()[0];
 		Double price = map.get(specifier);
