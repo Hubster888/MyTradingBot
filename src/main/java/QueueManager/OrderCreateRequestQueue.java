@@ -23,7 +23,7 @@ import com.oanda.v20.order.OrderRequest;
 import com.oanda.v20.order.OrderSpecifier;
 import com.oanda.v20.transaction.TransactionID;
 
-import MyTradingBot.MyTradingBot.ConstantValues;
+import MyTradingBot.ConstantValues;
 import Threads.TwitterThread;
 
 /**

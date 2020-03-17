@@ -13,7 +13,7 @@ import com.oanda.v20.order.OrderCancelResponse;
 import com.oanda.v20.order.OrderSpecifier;
 import com.oanda.v20.transaction.TransactionID;
 
-import MyTradingBot.MyTradingBot.ConstantValues;
+import MyTradingBot.ConstantValues;
 
 /**
  * This class will hold and manage the queue that contains all

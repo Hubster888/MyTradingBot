@@ -23,7 +23,7 @@ import com.oanda.v20.trade.TradeContext;
 import com.oanda.v20.trade.TradeSpecifier;
 import com.oanda.v20.transaction.TransactionID;
 
-import MyTradingBot.MyTradingBot.ConstantValues;
+import MyTradingBot.ConstantValues;
 
 /**
  * This class will hold and manage the queue that contains all

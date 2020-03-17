@@ -41,7 +41,7 @@ public class TwitterThread extends Thread {
 				for(String result : results) {
 					if(!result.equals("Null")) {
 						recordTweetRecived(result);
-						logger.log(Level.INFO, result);
+						//logger.log(Level.INFO, result);
 						CopyTwitterStrategy.getQueue().add(result);
 					}
 				}

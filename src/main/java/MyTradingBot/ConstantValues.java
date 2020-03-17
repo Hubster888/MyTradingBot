@@ -1,4 +1,4 @@
-package MyTradingBot.MyTradingBot;
+package MyTradingBot;
 
 import com.oanda.v20.Context;
 import com.oanda.v20.ContextBuilder;
@@ -6,12 +6,12 @@ import com.oanda.v20.account.AccountID;
 
 public class ConstantValues {
 	private final static String URL = "https://api-fxpractice.oanda.com";
-	private final static String ACCESS_TOKEN = "edbe715b87f077cbb4567a4a58f90421-90ac55c43f6c136f2194b70051ff103f";
-	private final static AccountID ACCOUNT_ID = new AccountID("101-004-13661335-002");
-	private final static Double STANDARD_UNITS_TRADED = 1000.0;
+	private final static String ACCESS_TOKEN = "dc2d5455f7afb93f08fdb9215d743d63-b71c4c121ffdfe94b8da839aec55e568";
+	private final static AccountID ACCOUNT_ID = new AccountID("101-004-13661335-003");
+	private final static Double STANDARD_UNITS_TRADED = 2000.0;
 	private final static Context CTX = new ContextBuilder(URL)
     		.setToken(ACCESS_TOKEN)
-    		.setApplication("MyTradingBot")
+    		.setApplication("MyTradingBot-1.jar")
     		.build();
 	private final static Double CANCEL_PERCENT_1H = 0.0095;
 	private final static Double CANCEL_PERCENT_4H = 0.012;

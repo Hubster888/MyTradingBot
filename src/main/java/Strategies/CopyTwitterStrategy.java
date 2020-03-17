@@ -14,7 +14,7 @@ import com.oanda.v20.primitives.InstrumentName;
 import com.oanda.v20.transaction.StopLossDetails;
 import com.oanda.v20.transaction.TakeProfitDetails;
 
-import MyTradingBot.MyTradingBot.ConstantValues;
+import MyTradingBot.ConstantValues;
 import QueueManager.OrderCreateRequestQueue;
 
 public class CopyTwitterStrategy {
