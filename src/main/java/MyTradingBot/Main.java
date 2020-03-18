@@ -13,6 +13,7 @@ import com.oanda.v20.account.AccountChangesResponse;
 import com.oanda.v20.trade.TradeSummary;
 import com.oanda.v20.transaction.TransactionID;
 
+import Documenting.Documentor;
 import MyTradingBot.ConstantValues;
 import Threads.QueueManagmentThread;
 import Threads.TwitterThread;
@@ -30,12 +31,14 @@ public class Main
     	TransactionID since = null;
     	TwitterThread twitterThread = new TwitterThread();
     	QueueManagmentThread queueThread = new QueueManagmentThread();
+    	@SuppressWarnings("unused")
+		Documentor documentor = new Documentor();
         twitterThread.start();
         queueThread.start();
         
         while(true) {
         	if(since == null) {
-        		since = new TransactionID("1");
+        		since = new TransactionID("1000");
         		AccountChangesRequest accountRequest = new AccountChangesRequest(ConstantValues.getAccountId()).setSinceTransactionID(since);
         		AccountChangesResponse accountResponse = ConstantValues.getCtx().account.changes(accountRequest);
         		since = accountResponse.getLastTransactionID();

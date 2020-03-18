@@ -13,13 +13,14 @@ public class ConstantValues {
     		.setToken(ACCESS_TOKEN)
     		.setApplication("MyTradingBot-1.jar")
     		.build();
-	private final static Double CANCEL_PERCENT_1H = 0.0095;
-	private final static Double CANCEL_PERCENT_4H = 0.012;
-	private final static Double CANCEL_PERCENT_5H = 0.013;
-	private final static Double CANCEL_PERCENT_1D = 0.025;
+	private final static Double CANCEL_PERCENT_1H = 0.005;
+	private final static Double CANCEL_PERCENT_4H = 0.008;
+	private final static Double CANCEL_PERCENT_5H = 0.009;
+	private final static Double CANCEL_PERCENT_1D = 0.015;
 	private final static Double MIN_BALANCE = 300.0;
 	private final static Double MAX_OPEN_TRADES = 15.0;
-	private final static Double MIN_MARGIN = 200.0;
+	private final static Double MIN_MARGIN = 400.0;
+	private final static Double BAD_MARGIN = 200.0;
 	
 	
 	/**
@@ -27,6 +28,13 @@ public class ConstantValues {
 	 * */
 	public static Double getCancelPercent1H() {
 		return CANCEL_PERCENT_1H;
+	}
+	
+	/**
+	 * @return the point where the margin is too low
+	 * */
+	public static Double getBadMargin() {
+		return BAD_MARGIN;
 	}
 	
 	/**

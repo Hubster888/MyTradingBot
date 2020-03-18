@@ -1,12 +1,8 @@
 package QueueManager;
 
-import java.io.IOException;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 import com.oanda.v20.Context;
 import com.oanda.v20.ContextBuilder;
@@ -15,16 +11,19 @@ import com.oanda.v20.RequestException;
 import com.oanda.v20.account.AccountContext;
 import com.oanda.v20.account.AccountGetResponse;
 import com.oanda.v20.account.AccountID;
+import com.oanda.v20.order.Order;
 import com.oanda.v20.order.OrderCreate400RequestException;
 import com.oanda.v20.order.OrderCreate404RequestException;
 import com.oanda.v20.order.OrderCreateRequest;
 import com.oanda.v20.order.OrderCreateResponse;
 import com.oanda.v20.order.OrderRequest;
 import com.oanda.v20.order.OrderSpecifier;
-import com.oanda.v20.transaction.TransactionID;
+import com.oanda.v20.order.OrderState;
+import com.oanda.v20.trade.TradeSpecifier;
+import com.oanda.v20.trade.TradeState;
+import com.oanda.v20.trade.TradeSummary;
 
 import MyTradingBot.ConstantValues;
-import Threads.TwitterThread;
 
 /**
  * This class will hold and manage the queue that contains all
@@ -42,19 +41,11 @@ public class OrderCreateRequestQueue {
     		.setToken(accessToken)
     		.setApplication("MyTradingBot")
     		.build();
-	private static final Logger logger =
-	        Logger.getLogger(TwitterThread.class.getName());
 	
 	/**
 	 * Empty constructor
 	 * */
 	public OrderCreateRequestQueue() {
-		try {
-			setup();
-		} catch (IOException e) {
-			System.out.println("There is an error with the logg set up");
-			e.printStackTrace();
-		}
 	}
 	
 	/**
@@ -94,13 +85,8 @@ public class OrderCreateRequestQueue {
 				if(isSafeToOrder()) {
 					OrderCreateRequest createRequest = new OrderCreateRequest(accountId)
 							.setOrder(requestedOrder);
+					@SuppressWarnings("unused")
 					OrderCreateResponse response = ctx.order.create(createRequest);
-					TransactionID createTransactionId = response.getOrderCreateTransaction().getId();
-					if(true/*TODO OrderManager.getLatestID == createTransactionId*/) { // Check if the order is added correctly and return true
-						addToLog(createTransactionId);
-						sendNotification(createTransactionId);
-						return true;
-					}
 				}else {
 					return false;
 				}
@@ -114,6 +100,9 @@ public class OrderCreateRequestQueue {
 		}
 	}
 	
+	/**
+	 * @return true if it is safe to order
+	 * */
 	private static Boolean isSafeToOrder() throws RequestException, ExecuteException {
 		AccountContext accountCtx = new AccountContext(ConstantValues.getCtx());
 		AccountGetResponse response = accountCtx.get(ConstantValues.getAccountId());
@@ -126,30 +115,31 @@ public class OrderCreateRequestQueue {
 		
 		Double marginAvaliable = response.getAccount().getMarginAvailable().doubleValue();
 		Boolean marginIsFine = marginAvaliable > ConstantValues.getMinMargin();
-		
+		Boolean marginIsVeryBad = marginAvaliable < ConstantValues.getBadMargin();
+		if(marginIsVeryBad || !balanceIsCorrect) {
+			emergencyExit(response);
+		}
 		if(balanceIsCorrect && notTooManyTrades && marginIsFine) {
 			return true;
 		}
 		return false;
 	}
 	
-	/**
-	 * @param the transaction ID of the request
-	 * Creates a log entry that shows the created order info
-	 * @throws ExecuteException 
-	 * @throws RequestException 
-	 * */
-	private void addToLog(TransactionID transactionId) throws RequestException, ExecuteException {
-		logger.log(Level.INFO, ctx.order.get(accountId, new OrderSpecifier(transactionId)).getOrder().toString());
-	}
-	
-	/**
-	 * @param the transaction ID of the request
-	 * Sends an email notification about the created order
-	 * */
-	private void sendNotification(TransactionID transactionId) {
-		//System.out.println("This method is not implemented!!");
-		//TODO implement this method
+	private static void emergencyExit(AccountGetResponse response) throws RequestException, ExecuteException {
+		List<TradeSummary> listOfTrades = response.getAccount().getTrades();
+		for(TradeSummary trade : listOfTrades) {
+			if(trade.getState().equals(TradeState.OPEN)) {
+				TradeChangeRequestQueue.addCloseTradeToQueue(new TradeSpecifier(trade.getId()));
+			}
+		}
+		List<Order> listOfOrders = response.getAccount().getOrders();
+		for(Order order : listOfOrders) {
+			if(order.getState().equals(OrderState.PENDING)) {
+				OrderCancelRequestQueue.addToQueue(new OrderSpecifier(order.getId()));
+			}
+		}
+		//TODO Generate a crash report and email it
+		System.exit(1);
 	}
 	
 	/**
@@ -164,16 +154,4 @@ public class OrderCreateRequestQueue {
 			return false;
 		}
 	}
-	
-	static public void setup() throws IOException {
-		logger.setUseParentHandlers(false);
-		
-        logger.setLevel(Level.INFO);
-        FileHandler fileTxt = new FileHandler("orderLogger.txt");
-
-        // create a TXT formatter
-        SimpleFormatter formatterTxt = new SimpleFormatter();
-        fileTxt.setFormatter(formatterTxt);
-        logger.addHandler(fileTxt);
-    }
 }

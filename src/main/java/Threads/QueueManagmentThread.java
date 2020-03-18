@@ -41,7 +41,7 @@ public class QueueManagmentThread extends Thread{
 				if(!tradeChangeQueues.changeTakeProfitQueueIsEmpty()) {
 					if(tradeChangeQueues.executeTakeProfit()) {System.out.println("Trade's take profit changed");}
 				}
-				Thread.sleep(100);
+				Thread.sleep(1000);
 			}
 		}catch(Exception e) {
 			e.printStackTrace();

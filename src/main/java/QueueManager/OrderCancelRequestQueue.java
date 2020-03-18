@@ -94,7 +94,7 @@ public class OrderCancelRequestQueue {
 	 * @param the order specifier of the order that will be cancelled
 	 * @return returns true if the order specifier is adds correctly
 	 * */
-	public Boolean addToQueue(OrderSpecifier orderSpecifier) {
+	public static Boolean addToQueue(OrderSpecifier orderSpecifier) {
 		return queueOfCancelRequests.add(orderSpecifier);
 	}
 	

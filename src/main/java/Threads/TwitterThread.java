@@ -5,10 +5,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 import DataCollection.TweetCollector;
 import Strategies.CopyTwitterStrategy;
@@ -20,16 +16,9 @@ import Strategies.CopyTwitterStrategy;
  * thread. 
  * */
 public class TwitterThread extends Thread {
-	private static final Logger logger =
-			Logger.getLogger(TwitterThread.class.getName());
+
 
 	public void run() {
-		try {
-			setup();
-		} catch (IOException e1) {
-			System.out.println("There is something wrong with the logg setup");
-			e1.printStackTrace();
-		}
 		try {
 			System.out.println("twitter thread is running");
 			TweetCollector tweetCollector = new TweetCollector();
@@ -41,7 +30,6 @@ public class TwitterThread extends Thread {
 				for(String result : results) {
 					if(!result.equals("Null")) {
 						recordTweetRecived(result);
-						//logger.log(Level.INFO, result);
 						CopyTwitterStrategy.getQueue().add(result);
 					}
 				}
@@ -50,18 +38,6 @@ public class TwitterThread extends Thread {
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	static public void setup() throws IOException {
-		logger.setUseParentHandlers(false);
-
-		logger.setLevel(Level.INFO);
-		FileHandler fileTxt = new FileHandler("tweetLogger.txt");
-
-		// create a TXT formatter
-		SimpleFormatter formatterTxt = new SimpleFormatter();
-		fileTxt.setFormatter(formatterTxt);
-		logger.addHandler(fileTxt);
 	}
 
 	public static void recordTweetRecived(String data) throws IOException {

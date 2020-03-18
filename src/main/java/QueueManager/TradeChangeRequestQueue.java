@@ -91,7 +91,7 @@ public class TradeChangeRequestQueue {
 	 * @param the trade specifier of the trade to cancel
 	 * @return true if the trade is added to the queue
 	 * */
-	public Boolean addCloseTradeToQueue(TradeSpecifier tradeSpecifier) {
+	public static Boolean addCloseTradeToQueue(TradeSpecifier tradeSpecifier) {
 		return tradesToCancel.add(tradeSpecifier);
 	}
 	
