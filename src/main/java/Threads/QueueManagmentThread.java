@@ -1,5 +1,8 @@
 package Threads;
 
+import java.util.Date;
+
+import Documenting.Documentor;
 import QueueManager.*;
 import Strategies.CopyTwitterStrategy;
 
@@ -10,6 +13,7 @@ import Strategies.CopyTwitterStrategy;
  * queue manager.
  * */
 public class QueueManagmentThread extends Thread{
+	private final Documentor documentor = new Documentor();
 	
 	public void run() {
 		try {
@@ -24,26 +28,27 @@ public class QueueManagmentThread extends Thread{
 					CopyTwitterStrategy.executeTweet();
 				}
 				if(!orderCancelQueue.isEmpty()) {
-					if(orderCancelQueue.executeCancel()) {System.out.println("Order cancelled");}
+					if(orderCancelQueue.executeCancel()) {System.out.println("Order cancelled");} else {documentor.addError("order cancel failed at " + new Date());}
 				}
 				if(!orderCreateQueue.isEmpty()) {
-					if(orderCreateQueue.executeRequest()) {System.out.println("Order created");}else {System.out.println("create order failed");}
+					if(orderCreateQueue.executeRequest()) {System.out.println("Order created");} else {documentor.addError("order crate failed at " + new Date());}
 				}
 				if(!orderChangeQueue.isEmpty()) {
-					if(orderChangeQueue.executeChange()) {System.out.println("Order is changed");}
+					if(orderChangeQueue.executeChange()) {System.out.println("Order is changed");} else {documentor.addError("order change failed at " + new Date());}
 				}
 				if(!tradeChangeQueues.tradesToCancelIsEmpty()) {
-					if(tradeChangeQueues.executeCancel()) {System.out.println("Trade is cancelled");}
+					if(tradeChangeQueues.executeCancel()) {System.out.println("Trade is cancelled");} else {documentor.addError("trade cancel failed at " + new Date());}
 				}
 				if(!tradeChangeQueues.changeStopLossQueueIsEmpty()) {
-					if(tradeChangeQueues.executeStopLoss()) {System.out.println("Trade's stop loss changed");}
+					if(tradeChangeQueues.executeStopLoss()) {System.out.println("Trade's stop loss changed");} else {documentor.addError("trade change stop loss failed at " + new Date());}
 				}
 				if(!tradeChangeQueues.changeTakeProfitQueueIsEmpty()) {
-					if(tradeChangeQueues.executeTakeProfit()) {System.out.println("Trade's take profit changed");}
+					if(tradeChangeQueues.executeTakeProfit()) {System.out.println("Trade's take profit changed");} else {documentor.addError("trade change take profit failed at " + new Date());}
 				}
 				Thread.sleep(1000);
 			}
 		}catch(Exception e) {
+			documentor.addError(e.getMessage());
 			e.printStackTrace();
 		}
 	}

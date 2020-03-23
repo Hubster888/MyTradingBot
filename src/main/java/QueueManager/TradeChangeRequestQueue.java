@@ -21,6 +21,7 @@ import com.oanda.v20.transaction.StopLossDetails;
 import com.oanda.v20.transaction.TakeProfitDetails;
 import com.oanda.v20.transaction.TransactionID;
 
+import Documenting.Documentor;
 import MyTradingBot.ConstantValues;
 
 /**
@@ -39,6 +40,7 @@ public class TradeChangeRequestQueue {
     		.setToken(accessToken)
     		.setApplication("MyTradingBot")
     		.build();
+	private static Documentor documentor = new Documentor();
 	
 	/**
 	 * An empty constructor
@@ -131,12 +133,12 @@ public class TradeChangeRequestQueue {
 			TradeCloseResponse response = ctx.trade.close(request);
 			TransactionID transactionId = response.getLastTransactionID();
 			if(changeStopLossQueueIsEmpty()/*TODO OrderManager.getLatestID == transactionId*/) {
-				addToLog(transactionId);
 				sendNotification(transactionId);
 				return true;
 			}
 			return true;
 		}else {
+			documentor.addError("the trade specifier is not valid | executeCancel() | TradeChangeRequestQueue"); 
 			return false;
 		}
 	}
@@ -159,13 +161,13 @@ public class TradeChangeRequestQueue {
 			TradeSetDependentOrdersResponse response = ctx.trade.setDependentOrders(request);
 			TransactionID transactionId = response.getLastTransactionID();
 			if(changeStopLossQueueIsEmpty()/*TODO OrderManager.getLatestID == transactionId*/) {
-				addToLog(transactionId);
 				sendNotification(transactionId);
 				return true;
 			}else {
 				return false;
 			}
 		}else {
+			documentor.addError("the values are not valid | executeStopLoss() | TradeChangeRequestQueue"); 
 			return false;
 		}
 	}
@@ -187,13 +189,13 @@ public class TradeChangeRequestQueue {
 			TradeSetDependentOrdersResponse response = ctx.trade.setDependentOrders(request);
 			TransactionID transactionId = response.getLastTransactionID();
 			if(changeStopLossQueueIsEmpty()/*TODO OrderManager.getLatestID == transactionId*/) {
-				addToLog(transactionId);
 				sendNotification(transactionId);
 				return true;
 			}else {
 				return false;
 			}
 		}else {
+			documentor.addError("the values are not valid | executeStopLoss() | TradeChangeRequestQueue"); 
 			return false;
 		}
 	}
@@ -209,14 +211,6 @@ public class TradeChangeRequestQueue {
 		}else {
 			return false;
 		}
-	}
-	
-	/**
-	 * @param the transactionId of the trade change
-	 * */
-	private void addToLog(TransactionID transactionId) {
-		System.out.println("Method not implemented");
-		//TODO implement this method
 	}
 	
 	/**

@@ -13,6 +13,7 @@ import com.oanda.v20.order.OrderCancelResponse;
 import com.oanda.v20.order.OrderSpecifier;
 import com.oanda.v20.transaction.TransactionID;
 
+import Documenting.Documentor;
 import MyTradingBot.ConstantValues;
 
 /**
@@ -30,6 +31,7 @@ public class OrderCancelRequestQueue {
     		.setToken(accessToken)
     		.setApplication("MyTradingBot")
     		.build();
+	private static Documentor documentor = new Documentor();
 	
 	public OrderCancelRequestQueue() {}
 	
@@ -52,12 +54,12 @@ public class OrderCancelRequestQueue {
 			OrderCancelResponse response = ctx.order.cancel(accountId, specifier);
 			TransactionID closingTransactionId = response.getOrderCancelTransaction().getId();
 			if(isEmpty()/*TODO OrderManager.getLatestID == closingTransactionId*/) {
-				addToLog(closingTransactionId);
 				sendNotification(closingTransactionId);
 				return true;
 			}
 			return true;
 		}else {
+			documentor.addError("the specifier is not valid | in the method executeCancel() | OrderCancelRequestQueue");
 			return false;
 		}
 	}
@@ -72,14 +74,6 @@ public class OrderCancelRequestQueue {
 		}else {
 			return false;
 		}
-	}
-	
-	/**
-	 * @param the transactionID of the closed order
-	 * */
-	private void addToLog(TransactionID transactionId) {
-		System.out.println("This method is not implemented!!");
-		//TODO implement this method
 	}
 	
 	/**

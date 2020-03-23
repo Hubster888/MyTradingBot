@@ -8,6 +8,7 @@ import com.oanda.v20.ExecuteException;
 import com.oanda.v20.RequestException;
 import com.oanda.v20.account.AccountContext;
 import com.oanda.v20.account.AccountGetResponse;
+import com.oanda.v20.transaction.TransactionID;
 
 import MyTradingBot.ConstantValues;
 
@@ -29,20 +30,21 @@ public class Documentor {
 		numOfTradesClosed = 0;
 		listOfFailedTweets = new LinkedList<FailedTweet>();
 		listOfErrors = new LinkedList<String>();
+		TransactionID startOfDayID = response.getAccount().getLastTransactionID();
 		AccountContext accountCtx = new AccountContext(ConstantValues.getCtx());
 		try {
 			response = accountCtx.get(ConstantValues.getAccountId());
 		} catch (RequestException e) {
-			// TODO Auto-generated catch block
+			addError(e.getMessage());
 			e.printStackTrace();
 		} catch (ExecuteException e) {
-			// TODO Auto-generated catch block
+			addError(e.getMessage());
 			e.printStackTrace();
 		}
 		NAVAtStartOfDay = response.getAccount().getNAV().doubleValue();
 		Timer time = new Timer(); // Instantiate Timer Object
 		SendReport st = new SendReport(response, numOfTweetsRecived, numOfTradesOpened,
-        		numOfTradesClosed, NAVAtStartOfDay, listOfFailedTweets, listOfErrors); // Instantiate SheduledTask class
+        		numOfTradesClosed, NAVAtStartOfDay, listOfFailedTweets, listOfErrors, startOfDayID); // Instantiate SheduledTask class
 		time.schedule(st, 0, 1000 * 60 * 60 * 12);
 	}
 
@@ -61,13 +63,6 @@ public class Documentor {
 	}
 
 	/**
-	 * Adds to trades closed count
-	 * */
-	public void addTradeClosed() {
-		numOfTradesClosed++;
-	}
-
-	/**
 	 * Adds to failed tweet list
 	 * */
 	public void addFailedTweet(FailedTweet failedTweet) {
@@ -79,6 +74,13 @@ public class Documentor {
 	 * */
 	public void addError(String error) {
 		listOfErrors.add(error);
+	}
+	
+	/**
+	 * @return the list of errors
+	 * */
+	public List<String> getListOfErrors(){
+		return listOfErrors;
 	}
 
 }

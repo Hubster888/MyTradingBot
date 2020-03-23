@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import Documenting.Documentor;
 import twitter4j.Query;
 import twitter4j.QueryResult;
 import twitter4j.Status;
@@ -31,6 +32,7 @@ public class TweetCollector {
 			.setTweetModeExtended(true)
 			.build())
 			.getInstance();
+	private static Documentor documentor = new Documentor();
 	private static Date since = null;
 
 	public TweetCollector() {
@@ -49,6 +51,7 @@ public class TweetCollector {
 		try {
 			result = twitter.search(query);
 		} catch (TwitterException e) {
+			documentor.addError(e.getMessage());
 			e.printStackTrace();
 		}
 		return result.getTweets();
@@ -75,6 +78,7 @@ public class TweetCollector {
 					}
 				}
 			}catch(Exception e) {
+				documentor.addError(e.getMessage());
 				System.out.println(e.toString() + " ff");
 				return null;
 			}

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import DataCollection.TweetCollector;
+import Documenting.Documentor;
 import Strategies.CopyTwitterStrategy;
 
 /**
@@ -16,7 +17,7 @@ import Strategies.CopyTwitterStrategy;
  * thread. 
  * */
 public class TwitterThread extends Thread {
-
+	private static Documentor documentor = new Documentor();
 
 	public void run() {
 		try {
@@ -29,6 +30,7 @@ public class TwitterThread extends Thread {
 				System.out.println("Number of new tweets: " + results.size());
 				for(String result : results) {
 					if(!result.equals("Null")) {
+						documentor.addTweetRecived();
 						recordTweetRecived(result);
 						CopyTwitterStrategy.getQueue().add(result);
 					}
@@ -36,6 +38,7 @@ public class TwitterThread extends Thread {
 				Thread.sleep(60005);
 			}
 		}catch(Exception e) {
+			documentor.addError(e.getMessage());
 			e.printStackTrace();
 		}
 	}
@@ -47,6 +50,7 @@ public class TwitterThread extends Thread {
 			fr.write(data + "\n");
 			fr.close();
 		} catch (IOException e) {
+			documentor.addError(e.getMessage());
 			e.printStackTrace();
 		}
 	}

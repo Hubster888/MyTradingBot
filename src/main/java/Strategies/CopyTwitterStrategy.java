@@ -7,21 +7,22 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.oanda.v20.order.MarketIfTouchedOrderRequest;
+import com.oanda.v20.order.LimitOrderRequest;
 import com.oanda.v20.order.MarketOrderRequest;
 import com.oanda.v20.order.OrderRequest;
 import com.oanda.v20.primitives.InstrumentName;
 import com.oanda.v20.transaction.StopLossDetails;
 import com.oanda.v20.transaction.TakeProfitDetails;
 
+import Documenting.Documentor;
 import MyTradingBot.ConstantValues;
 import QueueManager.OrderCreateRequestQueue;
 
 public class CopyTwitterStrategy {
-	//TODO improve the accuracy of the tweets by analysing historical tweets
 	public static Queue<String> unusedTweets = new LinkedList<String>();
 	private static final Pattern SignalFactoryPattern = Pattern.compile("^(Signal Factory{1})(.+)(Sell{1}|Buy{1})(.)([A-Z]{6})(@)([0-9]+.[0-9]+)(.+)(SL:)([0-9]+.[0-9]+)(.+)(TP:)([0-9]+.[0-9]+)");
 	private static final Pattern MXInvestorPattern = Pattern.compile("^(.+)(Buy|Sell).(([A-Z]{3}.[A-Z]{3})|Gold)(.+)([0-9]{1,3}H|D)");
+	private static Documentor documentor = new Documentor();
 
 	/**
 	 * @return the queue
@@ -42,13 +43,18 @@ public class CopyTwitterStrategy {
 
 		String tweet = unusedTweets.element();
 		unusedTweets.remove();
-		if(tweet.equals("")) { System.out.println("tweet is empty");}
+		if(tweet.equals("")) { 
+			System.out.println("tweet is empty");
+			documentor.addError("the tweet is empty | executeTweet() | CopyTwitterStrategy");
+			return;
+		}
 
 		if(tweet.contains("Signal Factory")) {
 			signalFactoryTweet(tweet);
 		}else if(tweet.contains("MX investing (Forex Signals)")) {
 			MXInvestingTweet(tweet);
 		}else {
+			documentor.addError("wrong users tweet | executeTweet() | CopyTwitterStrategy");
 			System.out.println("wrong user");
 		}
 	}
@@ -87,6 +93,7 @@ public class CopyTwitterStrategy {
 	private static Boolean MXInvestingTweet(String tweet) {
 		if(!verifyMXInvesting(tweet)) {
 			System.out.println("Tweet is invalid");
+			documentor.addError("the tweet is not valid | MXInvestingTweet() | CopyTwitterStrategy");
 			return false;
 		}
 		OrderRequest request = null;
@@ -112,13 +119,13 @@ public class CopyTwitterStrategy {
 				}else {
 					instrument = new InstrumentName(matcher.group(3).replace("/", "_"));
 					if(instrument.toString().contains("BTC")) {
+						documentor.addError("the tweet contains BTC | MXInvestingTweet() | CopyTwitterStrategy");
 						return false;
 					}
 				}
 				String timeFrame = matcher.group(6);
 				bullsPercentage = Double.parseDouble(tweet.split("\n")[2].split(" ")[2].split("%")[0]) / 100;
 				bearsPercentage = Double.parseDouble(tweet.split("\n")[3].split(" ")[2].split("%")[0]) / 100;
-				//Long instrumentPip = getPipForInstrument(instrument);
 				if(timeFrame.contains("H")) {
 					int num = Integer.parseInt(timeFrame.replace("H", ""));
 					switch(num) {
@@ -152,9 +159,11 @@ public class CopyTwitterStrategy {
 				}
 			}
 		}catch(Exception e) {
+			documentor.addError(e.getMessage());
 			e.printStackTrace();
 			return false;
 		}
+		// Create the request once data is collected
 		request = new MarketOrderRequest()
 				.setUnits(units)
 				.setInstrument(instrument)
@@ -165,6 +174,7 @@ public class CopyTwitterStrategy {
 		if(sendOrder(request)) {
 			return true;
 		}
+		documentor.addError("the sendOrder() failed | MXInvestingTweet() | CopyTwitterStrategy");
 		return false;
 	}
 
@@ -184,6 +194,7 @@ public class CopyTwitterStrategy {
 		
 		if(!verifySignalFactory(tweet)) {
 			System.out.println("Tweet is not valid");
+			documentor.addError("the tweet is not valid | signalFactoryTweet() | CopyTwitterStrategy");
 			return false;
 		}
 		try {
@@ -202,9 +213,10 @@ public class CopyTwitterStrategy {
 				}
 			}
 		}catch(Exception e) {
+			documentor.addError(e.getMessage());
 			e.printStackTrace();
 		}
-		request = new MarketIfTouchedOrderRequest()
+		request = new LimitOrderRequest()
 				.setInstrument(instrument)
 				.setUnits(units)
 				.setPrice(entryPrice)
@@ -215,6 +227,7 @@ public class CopyTwitterStrategy {
 		if(sendOrder(request)) {
 			return true;
 		}
+		documentor.addError("the sendOrder() failed | SignalFactoryTweet() | CopyTwitterStrategy");
 		return false;
 	}
 

@@ -19,10 +19,9 @@ import com.oanda.v20.order.OrderReplaceResponse;
 import com.oanda.v20.order.OrderRequest;
 import com.oanda.v20.order.OrderSpecifier;
 import com.oanda.v20.trade.Trade;
-import com.oanda.v20.trade.TradeContext;
-import com.oanda.v20.trade.TradeSpecifier;
 import com.oanda.v20.transaction.TransactionID;
 
+import Documenting.Documentor;
 import MyTradingBot.ConstantValues;
 
 /**
@@ -40,7 +39,8 @@ public class OrderChangeRequestQueue {
 			.setToken(accessToken)
 			.setApplication("MyTradingBot")
 			.build();
-
+	private static Documentor documentor = new Documentor();
+	
 	/**
 	 * An empty constructor
 	 * */
@@ -70,18 +70,13 @@ public class OrderChangeRequestQueue {
 			OrderReplaceResponse response = ctx.order.replace(replaceRequest);
 			TransactionID transactionId = response.getLastTransactionID();
 			if(isEmpty() /*TODO OrderManager.getLatestID == transactionId*/) {
-				try {
-					addToLog(transactionId);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 				sendNotification(transactionId);
 				return true;
 			}else {
 				return false;
 			}
 		}else {
+			documentor.addError("the change is not valid | in executeChange | OrderChangeRequestQueue");
 			return false;
 		}
 	}
@@ -97,19 +92,6 @@ public class OrderChangeRequestQueue {
 		}else {
 			return false;
 		}
-	}
-
-	/**
-	 * @param the transactionId of the change
-	 * @throws ExecuteException 
-	 * @throws RequestException 
-	 * @throws IOException 
-	 * */
-	private void addToLog(TransactionID transactionId) throws RequestException, ExecuteException, IOException {
-		TradeContext context = new TradeContext(ConstantValues.getCtx());
-		TradeSpecifier specifier = new TradeSpecifier(transactionId);
-		Trade summary = context.get(ConstantValues.getAccountId(), specifier).getTrade();
-		recordClosedTrade(summary);
 	}
 
 	/**
@@ -142,6 +124,7 @@ public class OrderChangeRequestQueue {
 			fr.write(trade.toString() + "\n");
 			fr.close();
 		} catch (IOException e) {
+			documentor.addError(e.getMessage());
 			e.printStackTrace();
 		}
 	}

@@ -7,16 +7,16 @@ import com.oanda.v20.account.AccountID;
 public class ConstantValues {
 	private final static String URL = "https://api-fxpractice.oanda.com";
 	private final static String ACCESS_TOKEN = "dc2d5455f7afb93f08fdb9215d743d63-b71c4c121ffdfe94b8da839aec55e568";
-	private final static AccountID ACCOUNT_ID = new AccountID("101-004-13661335-002");
+	private final static AccountID ACCOUNT_ID = new AccountID("101-004-13661335-003");
 	private final static Double STANDARD_UNITS_TRADED = 2000.0;
 	private final static Context CTX = new ContextBuilder(URL)
     		.setToken(ACCESS_TOKEN)
     		.setApplication("MyTradingBot-1.jar")
     		.build();
-	private final static Double CANCEL_PERCENT_1H = 0.005;
-	private final static Double CANCEL_PERCENT_4H = 0.008;
-	private final static Double CANCEL_PERCENT_5H = 0.009;
-	private final static Double CANCEL_PERCENT_1D = 0.015;
+	private final static Double CANCEL_PERCENT_1H = 0.002;
+	private final static Double CANCEL_PERCENT_4H = 0.005;
+	private final static Double CANCEL_PERCENT_5H = 0.006;
+	private final static Double CANCEL_PERCENT_1D = 0.008;
 	private final static Double MIN_BALANCE = 300.0;
 	private final static Double MAX_OPEN_TRADES = 15.0;
 	private final static Double MIN_MARGIN = 400.0;

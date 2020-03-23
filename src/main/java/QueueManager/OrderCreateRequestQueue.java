@@ -8,9 +8,14 @@ import com.oanda.v20.Context;
 import com.oanda.v20.ContextBuilder;
 import com.oanda.v20.ExecuteException;
 import com.oanda.v20.RequestException;
+import com.oanda.v20.account.AccountChangesRequest;
+import com.oanda.v20.account.AccountChangesResponse;
 import com.oanda.v20.account.AccountContext;
 import com.oanda.v20.account.AccountGetResponse;
 import com.oanda.v20.account.AccountID;
+import com.oanda.v20.order.LimitOrder;
+import com.oanda.v20.order.LimitOrderRequest;
+import com.oanda.v20.order.MarketOrderRequest;
 import com.oanda.v20.order.Order;
 import com.oanda.v20.order.OrderCreate400RequestException;
 import com.oanda.v20.order.OrderCreate404RequestException;
@@ -19,10 +24,14 @@ import com.oanda.v20.order.OrderCreateResponse;
 import com.oanda.v20.order.OrderRequest;
 import com.oanda.v20.order.OrderSpecifier;
 import com.oanda.v20.order.OrderState;
+import com.oanda.v20.order.OrderType;
+import com.oanda.v20.position.Position;
+import com.oanda.v20.primitives.InstrumentName;
 import com.oanda.v20.trade.TradeSpecifier;
 import com.oanda.v20.trade.TradeState;
 import com.oanda.v20.trade.TradeSummary;
 
+import Documenting.Documentor;
 import MyTradingBot.ConstantValues;
 
 /**
@@ -41,6 +50,7 @@ public class OrderCreateRequestQueue {
     		.setToken(accessToken)
     		.setApplication("MyTradingBot")
     		.build();
+	private static Documentor documentor = new Documentor();
 	
 	/**
 	 * Empty constructor
@@ -85,17 +95,20 @@ public class OrderCreateRequestQueue {
 				if(isSafeToOrder()) {
 					OrderCreateRequest createRequest = new OrderCreateRequest(accountId)
 							.setOrder(requestedOrder);
+					if(!orderIsNotRepeated(requestedOrder)) {documentor.addError("Order is repeated : " + createRequest.toString());;return false;}
 					@SuppressWarnings("unused")
 					OrderCreateResponse response = ctx.order.create(createRequest);
 				}else {
+					documentor.addError("it is not safe to order | executeRequest() | OrderCreateRequestQueue");
 					return false;
 				}
 			}catch(Exception e) {
-				System.out.println("execute request failed");
+				documentor.addError(e.getMessage());
 				e.printStackTrace();
 			}
 			return false;
 		}else { // If the order parameters are not valid, send a signal that the order is not added.
+			documentor.addError("the request is not valid | executeRequest() | OrderCreateRequestQueue");
 			return false;
 		}
 	}
@@ -138,7 +151,7 @@ public class OrderCreateRequestQueue {
 				OrderCancelRequestQueue.addToQueue(new OrderSpecifier(order.getId()));
 			}
 		}
-		//TODO Generate a crash report and email it
+		documentor.addError("SYSTEM FAILED: The system triggered an emergency exit");
 		System.exit(1);
 	}
 	
@@ -146,12 +159,63 @@ public class OrderCreateRequestQueue {
 	 * @param the order request to be checked
 	 * @return true if the order type is valid
 	 * */
-	private Boolean RequestIsValid(OrderRequest orderRequest) { //TODO find better way to verify
+	private Boolean RequestIsValid(OrderRequest orderRequest) {
 		if(orderRequest != null && orderRequest.getType() != null) {
 			return true;
 		}else {
 			System.out.println(orderRequest);
 			return false;
 		}
+	}
+	
+	/**
+	 * @param the order request to be executed
+	 * @return true if the order is fine to continue
+	 * */
+	private Boolean orderIsNotRepeated(OrderRequest request) {
+		OrderType orderType = request.getType();
+		AccountChangesRequest accountRequest = new AccountChangesRequest(ConstantValues.getAccountId());
+		AccountChangesResponse accountResponse = null;
+		try {
+			accountResponse = ConstantValues.getCtx().account.changes(accountRequest);
+		} catch (RequestException | ExecuteException e) {
+			documentor.addError(e.getMessage());
+			e.printStackTrace();
+			return false;
+		}
+		
+		if(orderType.equals(OrderType.MARKET)) {
+			InstrumentName instrument = ((MarketOrderRequest) request).getInstrument();
+			List<Position> listOfOpenPositions = accountResponse.getChanges().getPositions();
+			for(Position position : listOfOpenPositions) {
+				if(position.getInstrument().equals(instrument)) {
+					documentor.addError("The order instrument already exists in an open position");
+					return false;
+				}
+			}
+		}else if(orderType.equals(OrderType.LIMIT)) {
+			InstrumentName instrument = ((LimitOrderRequest) request).getInstrument(); 
+			AccountContext accountCTX = new AccountContext(ConstantValues.getCtx());
+			List<Order> listOfOrders = null;
+			try {
+				listOfOrders = accountCTX.get(ConstantValues.getAccountId()).getAccount().getOrders();
+			} catch (RequestException | ExecuteException e) {
+				documentor.addError(e.getMessage());
+				e.printStackTrace();
+				return false;
+			}
+			for(Order order : listOfOrders) {
+				if(order.getState().equals(OrderState.PENDING)) {
+					LimitOrder limitOrder = (LimitOrder) order;
+					if(!limitOrder.getInstrument().equals(instrument)) {
+						documentor.addError("The order already exists in the pending orders list");
+						return false;
+					}
+				}
+			}
+		}else {
+			return true;
+		}
+		return true;
 	}
 }

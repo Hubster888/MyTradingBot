@@ -10,6 +10,8 @@ import java.util.List;
 
 import com.oanda.v20.primitives.InstrumentName;
 
+import Documenting.Documentor;
+
 /**
  * This class will be used to stream data from the oanada
  * market. It will mostly include prices of specified
@@ -17,15 +19,17 @@ import com.oanda.v20.primitives.InstrumentName;
  * using historical data.
  * */
 public class DataStreamingService {
+	private static Documentor documentor = new Documentor();
 	
 	/**
 	 * Test the stream
 	 * */
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) {
 		try {
 			List<InstrumentName> listOfInstruments = new ArrayList<InstrumentName>();
 			priceGETStream(listOfInstruments);
 		}catch(Exception e) {
+			documentor.addError(e.getMessage());
 			System.out.println(e.getMessage());
 		}
 	}
