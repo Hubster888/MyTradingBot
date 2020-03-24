@@ -21,7 +21,7 @@ import com.oanda.v20.transaction.StopLossDetails;
 import com.oanda.v20.transaction.TakeProfitDetails;
 import com.oanda.v20.transaction.TransactionID;
 
-import Documenting.Documentor;
+import Documenting.SendReport;
 import MyTradingBot.ConstantValues;
 
 /**
@@ -40,7 +40,6 @@ public class TradeChangeRequestQueue {
     		.setToken(accessToken)
     		.setApplication("MyTradingBot")
     		.build();
-	private static Documentor documentor = new Documentor();
 	
 	/**
 	 * An empty constructor
@@ -138,7 +137,7 @@ public class TradeChangeRequestQueue {
 			}
 			return true;
 		}else {
-			documentor.addError("the trade specifier is not valid | executeCancel() | TradeChangeRequestQueue"); 
+			SendReport.addError("the trade specifier is not valid | executeCancel() | TradeChangeRequestQueue"); 
 			return false;
 		}
 	}
@@ -167,7 +166,7 @@ public class TradeChangeRequestQueue {
 				return false;
 			}
 		}else {
-			documentor.addError("the values are not valid | executeStopLoss() | TradeChangeRequestQueue"); 
+			SendReport.addError("the values are not valid | executeStopLoss() | TradeChangeRequestQueue"); 
 			return false;
 		}
 	}
@@ -195,7 +194,7 @@ public class TradeChangeRequestQueue {
 				return false;
 			}
 		}else {
-			documentor.addError("the values are not valid | executeStopLoss() | TradeChangeRequestQueue"); 
+			SendReport.addError("the values are not valid | executeStopLoss() | TradeChangeRequestQueue"); 
 			return false;
 		}
 	}

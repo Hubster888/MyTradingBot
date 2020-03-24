@@ -3,6 +3,7 @@ package MyTradingBot;
 import com.oanda.v20.Context;
 import com.oanda.v20.ContextBuilder;
 import com.oanda.v20.account.AccountID;
+import com.oanda.v20.transaction.TransactionID;
 
 public class ConstantValues {
 	private final static String URL = "https://api-fxpractice.oanda.com";
@@ -21,7 +22,15 @@ public class ConstantValues {
 	private final static Double MAX_OPEN_TRADES = 15.0;
 	private final static Double MIN_MARGIN = 400.0;
 	private final static Double BAD_MARGIN = 200.0;
+	private final static TransactionID TRANSCATION_ID = new TransactionID("1762");
 	
+	
+	/**
+	 * @return the last transaction id when the program starts
+	 * */
+	public static TransactionID getLatestTransactionID() {
+		return TRANSCATION_ID;
+	}
 	
 	/**
 	 * @return the percent used for 1H time frames

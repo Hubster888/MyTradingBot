@@ -25,33 +25,39 @@ import com.oanda.v20.transaction.TransactionID;
 import MyTradingBot.ConstantValues;
 
 public class SendReport extends TimerTask {
-	private AccountGetResponse response;
-	private int numOfTweetsRecived;
-	private int numOfTradesOpened;
-	private int numOfTradesClosed;
-	private Double NAVAtStartOfDay;
-	private List<FailedTweet> listOfFailedTweets;
-	private List<TradeSummary> listOfClosedTrades = new LinkedList<TradeSummary>();
-	private TransactionID startOfDayID;
-	private List<String> listOfErrors;
-	private static Documentor documentor = new Documentor();
+	private static AccountGetResponse response;
+	private static int numOfTweetsRecived;
+	private static int numOfTradesOpened;
+	private static int numOfTradesClosed;
+	private static Double NAVAtStartOfDay;
+	private static List<FailedTweet> listOfFailedTweets;
+	private static List<TradeSummary> listOfClosedTrades = new LinkedList<TradeSummary>();
+	private static TransactionID startOfDayID;
+	private static List<String> listOfErrors;
 	
 	public SendReport(AccountGetResponse response, int numOfTweetsRecived, int numOfTradesOpened, int numOfTradesClosed,
 			Double NAVAtStartOfDay, List<FailedTweet> listOfFailedTweets, List<String> listOfErrors, TransactionID startOfDayID) {
-		this.response = response;
-		this.numOfTweetsRecived = numOfTweetsRecived;
-		this.numOfTradesOpened = numOfTradesOpened;
-		this.numOfTradesClosed = numOfTradesClosed;
-		this.NAVAtStartOfDay = NAVAtStartOfDay;
-		this.listOfFailedTweets = listOfFailedTweets;
-		this.listOfErrors = documentor.getListOfErrors();
-		this.startOfDayID = startOfDayID;
+		SendReport.response = response;
+		SendReport.numOfTweetsRecived = numOfTweetsRecived;
+		SendReport.numOfTradesOpened = numOfTradesOpened;
+		SendReport.numOfTradesClosed = numOfTradesClosed;
+		SendReport.NAVAtStartOfDay = NAVAtStartOfDay;
+		SendReport.listOfFailedTweets = listOfFailedTweets;
+		SendReport.listOfErrors = getListOfErrors();
+		SendReport.startOfDayID = startOfDayID;
 	}
 	
-	private void sendReport() throws RequestException, ExecuteException {
-		this.listOfErrors = documentor.getListOfErrors();
+	public SendReport() {}
+	
+	private static void sendReport(){
+		SendReport.listOfErrors = getListOfErrors();
 		AccountChangesRequest accountRequest = new AccountChangesRequest(ConstantValues.getAccountId()).setSinceTransactionID(startOfDayID);
-		AccountChangesResponse accountResponse = ConstantValues.getCtx().account.changes(accountRequest);
+		AccountChangesResponse accountResponse = null;
+		try {
+			accountResponse = ConstantValues.getCtx().account.changes(accountRequest);
+		} catch (RequestException | ExecuteException e1) {
+			e1.printStackTrace();
+		}
 		listOfClosedTrades = accountResponse.getChanges().getTradesClosed();
 		int numOfOrdersCancelled = accountResponse.getChanges().getOrdersCancelled().size();
 		numOfTradesClosed = listOfClosedTrades.size();
@@ -76,19 +82,23 @@ public class SendReport extends TimerTask {
 		        "Number of orders cancelled: " + numOfOrdersCancelled);
 		
 		StringBuilder failedTweets = new StringBuilder();
+		failedTweets.append("\n" + "Failed Tweets" + "\n");
 		for(FailedTweet failedTweet : listOfFailedTweets) {
-			failedTweets.append(failedTweet.FailedTweetToString());
+			failedTweets.append(new Date() + " " + failedTweet.FailedTweetToString() + "\n");
 		}
 		
 		StringBuilder errors = new StringBuilder();
-		for(String error : listOfErrors) {
-			errors.append(error);
+		if(listOfErrors != null) {
+			for(String error : listOfErrors) {
+				errors.append(error + "\n");
+			}
 		}
 		
+		
 		StringBuilder closedTrades = new StringBuilder();
-		closedTrades.append("List of closed trades");
+		closedTrades.append("\n" + "List of closed trades" + "\n");
 		for(TradeSummary trade : listOfClosedTrades) {
-			closedTrades.append(trade.toString());
+			closedTrades.append(trade.toString() + "\n");
 		}
 		
 		StringBuilder mainMessage = new StringBuilder();
@@ -130,7 +140,7 @@ public class SendReport extends TimerTask {
 		     Transport.send(msg);
 		     System.out.println("Message sent.");
 		     }catch(Exception e) {
-		    	 documentor.addError(e.getMessage());
+		    	 addError(e.getMessage());
 		     }
 		     //Reset values for next day
 		     numOfTweetsRecived = 0;
@@ -140,19 +150,50 @@ public class SendReport extends TimerTask {
 		     listOfFailedTweets = new LinkedList<FailedTweet>();
 		     listOfErrors = new LinkedList<String>();
 		     startOfDayID = response.getAccount().getLastTransactionID();
+		     System.out.println("Email sent!");
 	}
 
 	@Override
 	public void run() {
-		try {
-			sendReport();
-	       } catch (Exception ex) {
-	    	   documentor.addError(ex.getMessage());
-	           System.out.println("error running thread " + ex.getMessage());
-	       }
+		
+		sendReport();
+	       
 		
 	}
 	
+	/**
+	 * Adds to the tweet count
+	 * */
+	public static void addTweetRecived() {
+		numOfTweetsRecived++;
+	}
+
+	/**
+	 * Adds to opened trade count
+	 * */
+	public void addTradeOpened() {
+		numOfTradesOpened++;
+	}
+
+	/**
+	 * Adds to failed tweet list
+	 * */
+	public void addFailedTweet(FailedTweet failedTweet) {
+		listOfFailedTweets.add(failedTweet);
+	}
+
+	/**
+	 * Adds an error to the document
+	 * */
+	public static void addError(String error) {
+		listOfErrors.add(error);
+	}
 	
+	/**
+	 * @return the list of errors
+	 * */
+	public static List<String> getListOfErrors(){
+		return listOfErrors;
+	}
 
 }

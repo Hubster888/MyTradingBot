@@ -21,7 +21,7 @@ import com.oanda.v20.order.OrderSpecifier;
 import com.oanda.v20.trade.Trade;
 import com.oanda.v20.transaction.TransactionID;
 
-import Documenting.Documentor;
+import Documenting.SendReport;
 import MyTradingBot.ConstantValues;
 
 /**
@@ -39,7 +39,6 @@ public class OrderChangeRequestQueue {
 			.setToken(accessToken)
 			.setApplication("MyTradingBot")
 			.build();
-	private static Documentor documentor = new Documentor();
 	
 	/**
 	 * An empty constructor
@@ -76,7 +75,7 @@ public class OrderChangeRequestQueue {
 				return false;
 			}
 		}else {
-			documentor.addError("the change is not valid | in executeChange | OrderChangeRequestQueue");
+			SendReport.addError("the change is not valid | in executeChange | OrderChangeRequestQueue");
 			return false;
 		}
 	}
@@ -124,7 +123,7 @@ public class OrderChangeRequestQueue {
 			fr.write(trade.toString() + "\n");
 			fr.close();
 		} catch (IOException e) {
-			documentor.addError(e.getMessage());
+			SendReport.addError(e.getMessage());
 			e.printStackTrace();
 		}
 	}

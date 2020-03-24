@@ -31,7 +31,7 @@ import com.oanda.v20.trade.TradeSpecifier;
 import com.oanda.v20.trade.TradeState;
 import com.oanda.v20.trade.TradeSummary;
 
-import Documenting.Documentor;
+import Documenting.SendReport;
 import MyTradingBot.ConstantValues;
 
 /**
@@ -50,7 +50,6 @@ public class OrderCreateRequestQueue {
     		.setToken(accessToken)
     		.setApplication("MyTradingBot")
     		.build();
-	private static Documentor documentor = new Documentor();
 	
 	/**
 	 * Empty constructor
@@ -95,20 +94,20 @@ public class OrderCreateRequestQueue {
 				if(isSafeToOrder()) {
 					OrderCreateRequest createRequest = new OrderCreateRequest(accountId)
 							.setOrder(requestedOrder);
-					if(!orderIsNotRepeated(requestedOrder)) {documentor.addError("Order is repeated : " + createRequest.toString());;return false;}
+					if(!orderIsNotRepeated(requestedOrder)) {SendReport.addError("Order is repeated : " + createRequest.toString());;return false;}
 					@SuppressWarnings("unused")
 					OrderCreateResponse response = ctx.order.create(createRequest);
 				}else {
-					documentor.addError("it is not safe to order | executeRequest() | OrderCreateRequestQueue");
+					SendReport.addError("it is not safe to order | executeRequest() | OrderCreateRequestQueue");
 					return false;
 				}
 			}catch(Exception e) {
-				documentor.addError(e.getMessage());
+				SendReport.addError(e.getMessage());
 				e.printStackTrace();
 			}
 			return false;
 		}else { // If the order parameters are not valid, send a signal that the order is not added.
-			documentor.addError("the request is not valid | executeRequest() | OrderCreateRequestQueue");
+			SendReport.addError("the request is not valid | executeRequest() | OrderCreateRequestQueue");
 			return false;
 		}
 	}
@@ -151,7 +150,7 @@ public class OrderCreateRequestQueue {
 				OrderCancelRequestQueue.addToQueue(new OrderSpecifier(order.getId()));
 			}
 		}
-		documentor.addError("SYSTEM FAILED: The system triggered an emergency exit");
+		SendReport.addError("SYSTEM FAILED: The system triggered an emergency exit");
 		System.exit(1);
 	}
 	
@@ -174,12 +173,12 @@ public class OrderCreateRequestQueue {
 	 * */
 	private Boolean orderIsNotRepeated(OrderRequest request) {
 		OrderType orderType = request.getType();
-		AccountChangesRequest accountRequest = new AccountChangesRequest(ConstantValues.getAccountId());
+		AccountChangesRequest accountRequest = new AccountChangesRequest(ConstantValues.getAccountId()).setSinceTransactionID(ConstantValues.getLatestTransactionID());
 		AccountChangesResponse accountResponse = null;
 		try {
 			accountResponse = ConstantValues.getCtx().account.changes(accountRequest);
 		} catch (RequestException | ExecuteException e) {
-			documentor.addError(e.getMessage());
+			SendReport.addError(e.getMessage());
 			e.printStackTrace();
 			return false;
 		}
@@ -189,7 +188,7 @@ public class OrderCreateRequestQueue {
 			List<Position> listOfOpenPositions = accountResponse.getChanges().getPositions();
 			for(Position position : listOfOpenPositions) {
 				if(position.getInstrument().equals(instrument)) {
-					documentor.addError("The order instrument already exists in an open position");
+					SendReport.addError("The order instrument already exists in an open position");
 					return false;
 				}
 			}
@@ -200,7 +199,7 @@ public class OrderCreateRequestQueue {
 			try {
 				listOfOrders = accountCTX.get(ConstantValues.getAccountId()).getAccount().getOrders();
 			} catch (RequestException | ExecuteException e) {
-				documentor.addError(e.getMessage());
+				SendReport.addError(e.getMessage());
 				e.printStackTrace();
 				return false;
 			}
@@ -208,7 +207,7 @@ public class OrderCreateRequestQueue {
 				if(order.getState().equals(OrderState.PENDING)) {
 					LimitOrder limitOrder = (LimitOrder) order;
 					if(!limitOrder.getInstrument().equals(instrument)) {
-						documentor.addError("The order already exists in the pending orders list");
+						SendReport.addError("The order already exists in the pending orders list");
 						return false;
 					}
 				}

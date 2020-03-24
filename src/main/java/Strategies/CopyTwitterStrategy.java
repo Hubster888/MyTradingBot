@@ -14,7 +14,7 @@ import com.oanda.v20.primitives.InstrumentName;
 import com.oanda.v20.transaction.StopLossDetails;
 import com.oanda.v20.transaction.TakeProfitDetails;
 
-import Documenting.Documentor;
+import Documenting.SendReport;
 import MyTradingBot.ConstantValues;
 import QueueManager.OrderCreateRequestQueue;
 
@@ -22,7 +22,6 @@ public class CopyTwitterStrategy {
 	public static Queue<String> unusedTweets = new LinkedList<String>();
 	private static final Pattern SignalFactoryPattern = Pattern.compile("^(Signal Factory{1})(.+)(Sell{1}|Buy{1})(.)([A-Z]{6})(@)([0-9]+.[0-9]+)(.+)(SL:)([0-9]+.[0-9]+)(.+)(TP:)([0-9]+.[0-9]+)");
 	private static final Pattern MXInvestorPattern = Pattern.compile("^(.+)(Buy|Sell).(([A-Z]{3}.[A-Z]{3})|Gold)(.+)([0-9]{1,3}H|D)");
-	private static Documentor documentor = new Documentor();
 
 	/**
 	 * @return the queue
@@ -45,7 +44,7 @@ public class CopyTwitterStrategy {
 		unusedTweets.remove();
 		if(tweet.equals("")) { 
 			System.out.println("tweet is empty");
-			documentor.addError("the tweet is empty | executeTweet() | CopyTwitterStrategy");
+			SendReport.addError("the tweet is empty | executeTweet() | CopyTwitterStrategy");
 			return;
 		}
 
@@ -54,7 +53,7 @@ public class CopyTwitterStrategy {
 		}else if(tweet.contains("MX investing (Forex Signals)")) {
 			MXInvestingTweet(tweet);
 		}else {
-			documentor.addError("wrong users tweet | executeTweet() | CopyTwitterStrategy");
+			SendReport.addError("wrong users tweet | executeTweet() | CopyTwitterStrategy");
 			System.out.println("wrong user");
 		}
 	}
@@ -93,7 +92,7 @@ public class CopyTwitterStrategy {
 	private static Boolean MXInvestingTweet(String tweet) {
 		if(!verifyMXInvesting(tweet)) {
 			System.out.println("Tweet is invalid");
-			documentor.addError("the tweet is not valid | MXInvestingTweet() | CopyTwitterStrategy");
+			SendReport.addError("the tweet is not valid | MXInvestingTweet() | CopyTwitterStrategy");
 			return false;
 		}
 		OrderRequest request = null;
@@ -119,7 +118,7 @@ public class CopyTwitterStrategy {
 				}else {
 					instrument = new InstrumentName(matcher.group(3).replace("/", "_"));
 					if(instrument.toString().contains("BTC")) {
-						documentor.addError("the tweet contains BTC | MXInvestingTweet() | CopyTwitterStrategy");
+						SendReport.addError("the tweet contains BTC | MXInvestingTweet() | CopyTwitterStrategy");
 						return false;
 					}
 				}
@@ -159,7 +158,7 @@ public class CopyTwitterStrategy {
 				}
 			}
 		}catch(Exception e) {
-			documentor.addError(e.getMessage());
+			SendReport.addError(e.getMessage());
 			e.printStackTrace();
 			return false;
 		}
@@ -174,7 +173,7 @@ public class CopyTwitterStrategy {
 		if(sendOrder(request)) {
 			return true;
 		}
-		documentor.addError("the sendOrder() failed | MXInvestingTweet() | CopyTwitterStrategy");
+		SendReport.addError("the sendOrder() failed | MXInvestingTweet() | CopyTwitterStrategy");
 		return false;
 	}
 
@@ -194,7 +193,7 @@ public class CopyTwitterStrategy {
 		
 		if(!verifySignalFactory(tweet)) {
 			System.out.println("Tweet is not valid");
-			documentor.addError("the tweet is not valid | signalFactoryTweet() | CopyTwitterStrategy");
+			SendReport.addError("the tweet is not valid | signalFactoryTweet() | CopyTwitterStrategy");
 			return false;
 		}
 		try {
@@ -213,7 +212,7 @@ public class CopyTwitterStrategy {
 				}
 			}
 		}catch(Exception e) {
-			documentor.addError(e.getMessage());
+			SendReport.addError(e.getMessage());
 			e.printStackTrace();
 		}
 		request = new LimitOrderRequest()
@@ -227,7 +226,7 @@ public class CopyTwitterStrategy {
 		if(sendOrder(request)) {
 			return true;
 		}
-		documentor.addError("the sendOrder() failed | SignalFactoryTweet() | CopyTwitterStrategy");
+		SendReport.addError("the sendOrder() failed | SignalFactoryTweet() | CopyTwitterStrategy");
 		return false;
 	}
 

@@ -13,7 +13,7 @@ import com.oanda.v20.order.OrderCancelResponse;
 import com.oanda.v20.order.OrderSpecifier;
 import com.oanda.v20.transaction.TransactionID;
 
-import Documenting.Documentor;
+import Documenting.SendReport;
 import MyTradingBot.ConstantValues;
 
 /**
@@ -31,7 +31,6 @@ public class OrderCancelRequestQueue {
     		.setToken(accessToken)
     		.setApplication("MyTradingBot")
     		.build();
-	private static Documentor documentor = new Documentor();
 	
 	public OrderCancelRequestQueue() {}
 	
@@ -59,7 +58,7 @@ public class OrderCancelRequestQueue {
 			}
 			return true;
 		}else {
-			documentor.addError("the specifier is not valid | in the method executeCancel() | OrderCancelRequestQueue");
+			SendReport.addError("the specifier is not valid | in the method executeCancel() | OrderCancelRequestQueue");
 			return false;
 		}
 	}

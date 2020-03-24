@@ -10,7 +10,8 @@ import java.util.List;
 
 import com.oanda.v20.primitives.InstrumentName;
 
-import Documenting.Documentor;
+import Documenting.SendReport;
+
 
 /**
  * This class will be used to stream data from the oanada
@@ -19,7 +20,6 @@ import Documenting.Documentor;
  * using historical data.
  * */
 public class DataStreamingService {
-	private static Documentor documentor = new Documentor();
 	
 	/**
 	 * Test the stream
@@ -29,7 +29,7 @@ public class DataStreamingService {
 			List<InstrumentName> listOfInstruments = new ArrayList<InstrumentName>();
 			priceGETStream(listOfInstruments);
 		}catch(Exception e) {
-			documentor.addError(e.getMessage());
+			SendReport.addError(e.getMessage());
 			System.out.println(e.getMessage());
 		}
 	}
