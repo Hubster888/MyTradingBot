@@ -1,16 +1,27 @@
 package QueueManager;
 
+<<<<<<< HEAD
 import java.util.Date;
+=======
+import java.io.IOException;
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import com.oanda.v20.Context;
 import com.oanda.v20.ContextBuilder;
 import com.oanda.v20.ExecuteException;
 import com.oanda.v20.RequestException;
+<<<<<<< HEAD
 import com.oanda.v20.account.AccountChangesRequest;
 import com.oanda.v20.account.AccountChangesResponse;
+=======
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 import com.oanda.v20.account.AccountContext;
 import com.oanda.v20.account.AccountGetResponse;
 import com.oanda.v20.account.AccountID;
@@ -24,6 +35,7 @@ import com.oanda.v20.order.OrderCreateRequest;
 import com.oanda.v20.order.OrderCreateResponse;
 import com.oanda.v20.order.OrderRequest;
 import com.oanda.v20.order.OrderSpecifier;
+<<<<<<< HEAD
 import com.oanda.v20.order.OrderState;
 import com.oanda.v20.order.OrderType;
 import com.oanda.v20.position.Position;
@@ -34,6 +46,12 @@ import com.oanda.v20.trade.TradeSummary;
 
 import Documenting.SendReport;
 import MyTradingBot.ConstantValues;
+=======
+import com.oanda.v20.transaction.TransactionID;
+
+import MyTradingBot.ConstantValues;
+import Threads.TwitterThread;
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 
 /**
  * This class will hold and manage the queue that contains all
@@ -51,11 +69,22 @@ public class OrderCreateRequestQueue {
     		.setToken(accessToken)
     		.setApplication("MyTradingBot")
     		.build();
+	private static final Logger logger =
+	        Logger.getLogger(TwitterThread.class.getName());
 	
 	/**
 	 * Empty constructor
 	 * */
 	public OrderCreateRequestQueue() {
+<<<<<<< HEAD
+=======
+		try {
+			setup();
+		} catch (IOException e) {
+			System.out.println("There is an error with the logg set up");
+			e.printStackTrace();
+		}
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 	}
 	
 	/**
@@ -96,16 +125,31 @@ public class OrderCreateRequestQueue {
 					OrderCreateRequest createRequest = new OrderCreateRequest(accountId)
 							.setOrder(requestedOrder);
 					OrderCreateResponse response = ctx.order.create(createRequest);
+<<<<<<< HEAD
 					SendReport.addOrderCreated(response.toString());
 					return true;
+=======
+					TransactionID createTransactionId = response.getOrderCreateTransaction().getId();
+					if(true/*TODO OrderManager.getLatestID == createTransactionId*/) { // Check if the order is added correctly and return true
+						addToLog(createTransactionId);
+						sendNotification(createTransactionId);
+						return true;
+					}
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 				}else {
 					return false;
 				}
 			}catch(Exception e) {
+<<<<<<< HEAD
 				SendReport.addError(e.getMessage() + " " + new Date());
 				e.printStackTrace();
 				return false;
+=======
+				System.out.println("execute request failed");
+				e.printStackTrace();
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 			}
+			return false;
 		}else { // If the order parameters are not valid, send a signal that the order is not added.
 			System.out.println("the request is not valid | executeRequest() | OrderCreateRequestQueue " + requestedOrder.toString());
 			SendReport.addError("the request is not valid | executeRequest() | OrderCreateRequestQueue " + requestedOrder.toString());
@@ -113,7 +157,27 @@ public class OrderCreateRequestQueue {
 		}
 	}
 	
+	private static Boolean isSafeToOrder() throws RequestException, ExecuteException {
+		AccountContext accountCtx = new AccountContext(ConstantValues.getCtx());
+		AccountGetResponse response = accountCtx.get(ConstantValues.getAccountId());
+		Double balance = response.getAccount().getBalance().doubleValue();
+		Double unrealisedPNL = response.getAccount().getUnrealizedPL().doubleValue();
+		Boolean balanceIsCorrect = (balance + unrealisedPNL) > ConstantValues.getMinBalance();
+		
+		Double openTrades = response.getAccount().getOpenTradeCount().doubleValue();
+		Boolean notTooManyTrades = openTrades < ConstantValues.getMaxOpenTrades();
+		
+		Double marginAvaliable = response.getAccount().getMarginAvailable().doubleValue();
+		Boolean marginIsFine = marginAvaliable > ConstantValues.getMinMargin();
+		
+		if(balanceIsCorrect && notTooManyTrades && marginIsFine) {
+			return true;
+		}
+		return false;
+	}
+	
 	/**
+<<<<<<< HEAD
 	 * @return true if it is safe to order
 	 * */
 	private static Boolean isSafeToOrder() throws RequestException, ExecuteException {
@@ -156,6 +220,24 @@ public class OrderCreateRequestQueue {
 		}
 		SendReport.addError("SYSTEM FAILED: The system triggered an emergency exit");
 		System.exit(1);
+=======
+	 * @param the transaction ID of the request
+	 * Creates a log entry that shows the created order info
+	 * @throws ExecuteException 
+	 * @throws RequestException 
+	 * */
+	private void addToLog(TransactionID transactionId) throws RequestException, ExecuteException {
+		logger.log(Level.INFO, ctx.order.get(accountId, new OrderSpecifier(transactionId)).getOrder().toString());
+	}
+	
+	/**
+	 * @param the transaction ID of the request
+	 * Sends an email notification about the created order
+	 * */
+	private void sendNotification(TransactionID transactionId) {
+		//System.out.println("This method is not implemented!!");
+		//TODO implement this method
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 	}
 	
 	/**
@@ -171,6 +253,7 @@ public class OrderCreateRequestQueue {
 		}
 	}
 	
+<<<<<<< HEAD
 	/**
 	 * @param the order request to be executed
 	 * @return true if the order is fine to continue
@@ -223,4 +306,17 @@ public class OrderCreateRequestQueue {
 		}
 		return true;
 	}
+=======
+	static public void setup() throws IOException {
+		logger.setUseParentHandlers(false);
+		
+        logger.setLevel(Level.INFO);
+        FileHandler fileTxt = new FileHandler("orderLogger.txt");
+
+        // create a TXT formatter
+        SimpleFormatter formatterTxt = new SimpleFormatter();
+        fileTxt.setFormatter(formatterTxt);
+        logger.addHandler(fileTxt);
+    }
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 }

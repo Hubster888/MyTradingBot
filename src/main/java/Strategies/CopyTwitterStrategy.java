@@ -1,15 +1,22 @@
 package Strategies;
 
+<<<<<<< HEAD
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.LinkedList;
 import java.util.List;
+=======
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.util.LinkedList;
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+<<<<<<< HEAD
 import com.oanda.v20.ExecuteException;
 import com.oanda.v20.RequestException;
 import com.oanda.v20.account.AccountInstrumentsRequest;
@@ -17,15 +24,27 @@ import com.oanda.v20.account.AccountInstrumentsResponse;
 import com.oanda.v20.order.MarketOrderRequest;
 import com.oanda.v20.order.OrderRequest;
 import com.oanda.v20.primitives.Instrument;
+=======
+import com.oanda.v20.order.MarketIfTouchedOrderRequest;
+import com.oanda.v20.order.MarketOrderRequest;
+import com.oanda.v20.order.OrderRequest;
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 import com.oanda.v20.primitives.InstrumentName;
 import com.oanda.v20.transaction.StopLossDetails;
 import com.oanda.v20.transaction.TakeProfitDetails;
 
+<<<<<<< HEAD
 import Documenting.SendReport;
+=======
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 import MyTradingBot.ConstantValues;
 import QueueManager.OrderCreateRequestQueue;
 
 public class CopyTwitterStrategy {
+<<<<<<< HEAD
+=======
+	//TODO improve the accuracy of the tweets by analysing historical tweets
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 	public static Queue<String> unusedTweets = new LinkedList<String>();
 	private static final Pattern SignalFactoryPattern = Pattern.compile("^(Signal Factory{1})(.+)(Sell{1}|Buy{1})(.)([A-Z]{6})(@)([0-9]+.[0-9]+)(.+)(SL:)([0-9]+.[0-9]+)(.+)(TP:)([0-9]+.[0-9]+)");
 	private static final Pattern MXInvestorPattern = Pattern.compile("^(.+)(Buy|Sell).(([A-Z]{3}.[A-Z]{3})|Gold)(.+)([0-9]{1,3}H|D)");
@@ -49,18 +68,25 @@ public class CopyTwitterStrategy {
 
 		String tweet = unusedTweets.element();
 		unusedTweets.remove();
+<<<<<<< HEAD
 		if(tweet.equals("")) { 
 			System.out.println("tweet is empty");
 			SendReport.addError("the tweet is empty | executeTweet() | CopyTwitterStrategy " + tweet);
 			return;
 		}
+=======
+		if(tweet.equals("")) { System.out.println("tweet is empty");}
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 
 		if(tweet.contains("Signal Factory")) {
 			signalFactoryTweet(tweet);
 		}else if(tweet.contains("MX investing (Forex Signals)")) {
 			MXInvestingTweet(tweet);
 		}else {
+<<<<<<< HEAD
 			SendReport.addError("wrong users tweet | executeTweet() | CopyTwitterStrategy " + tweet);
+=======
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 			System.out.println("wrong user");
 		}
 	}
@@ -99,10 +125,16 @@ public class CopyTwitterStrategy {
 	private static Boolean MXInvestingTweet(String tweet) {
 		if(!verifyMXInvesting(tweet)) {
 			System.out.println("Tweet is invalid");
+<<<<<<< HEAD
 			SendReport.addError("the tweet is not valid | MXInvestingTweet() | CopyTwitterStrategy " + tweet);
 			return false;
 		}
 		MarketOrderRequest request = null;
+=======
+			return false;
+		}
+		OrderRequest request = null;
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 		InstrumentName instrument = null;
 		String buyOrSell = null;
 		Double currentPrice = Double.parseDouble(tweet.split("\n")[1].split(" ")[2].replace(",", ""));
@@ -125,13 +157,17 @@ public class CopyTwitterStrategy {
 				}else {
 					instrument = new InstrumentName(matcher.group(3).replace("/", "_"));
 					if(instrument.toString().contains("BTC")) {
+<<<<<<< HEAD
 						SendReport.addError("the tweet contains BTC | MXInvestingTweet() | CopyTwitterStrategy " + tweet);
+=======
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 						return false;
 					}
 				}
 				String timeFrame = matcher.group(6);
 				bullsPercentage = Double.parseDouble(tweet.split("\n")[2].split(" ")[2].split("%")[0]) / 100;
 				bearsPercentage = Double.parseDouble(tweet.split("\n")[3].split(" ")[2].split("%")[0]) / 100;
+<<<<<<< HEAD
 				if(timeFrame.contains("H")) {
 					int num = Integer.parseInt(timeFrame.replace("H", ""));
 					switch(num) {
@@ -154,6 +190,31 @@ public class CopyTwitterStrategy {
 				}else {
 					stopLossPrice = calculateStopLoss(currentPrice, 10, instrument);
 					takeProfitPrice = calculateTakeProfit(currentPrice, 10, instrument);
+=======
+				//Long instrumentPip = getPipForInstrument(instrument);
+				if(timeFrame.contains("H")) {
+					int num = Integer.parseInt(timeFrame.replace("H", ""));
+					switch(num) {
+					case 1:
+						takeProfitPrice = Double.parseDouble(df.format(currentPrice + (currentPrice * ConstantValues.getCancelPercent1H())));
+						stopLossPrice = Double.parseDouble(df.format(currentPrice - (currentPrice * ConstantValues.getCancelPercent1H())));
+						break;
+					case 4:
+						takeProfitPrice = Double.parseDouble(df.format(currentPrice + (currentPrice * ConstantValues.getCancelPercent4H())));
+						stopLossPrice = Double.parseDouble(df.format(currentPrice - (currentPrice * ConstantValues.getCancelPercent4H())));
+						break;
+					case 5:
+						takeProfitPrice = Double.parseDouble(df.format(currentPrice + (currentPrice * ConstantValues.getCancelPercent5H())));
+						stopLossPrice = Double.parseDouble(df.format(currentPrice - (currentPrice * ConstantValues.getCancelPercent5H())));
+						break;
+					default:
+						takeProfitPrice = Double.parseDouble(df.format(currentPrice + (currentPrice * ConstantValues.getCancelPercent1H())));
+						stopLossPrice = Double.parseDouble(df.format(currentPrice - (currentPrice * ConstantValues.getCancelPercent1H())));
+					}
+				}else {
+					takeProfitPrice = Double.parseDouble(df.format(currentPrice + (currentPrice * ConstantValues.getCancelPercent1D())));
+					stopLossPrice = Double.parseDouble(df.format(currentPrice - (currentPrice * ConstantValues.getCancelPercent1D())));
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 				}
 				units = Double.parseDouble(dfUnit.format((ConstantValues.getUnitsTraded() * bullsPercentage)));
 				
@@ -165,6 +226,7 @@ public class CopyTwitterStrategy {
 				}
 			}
 		}catch(Exception e) {
+<<<<<<< HEAD
 			SendReport.addError(e.getMessage() + " " + tweet);
 			e.printStackTrace();
 			return false;
@@ -173,6 +235,11 @@ public class CopyTwitterStrategy {
 		// Create the request once data is collected
 		System.out.println("take proft at :" + takeProfitPrice);
 		System.out.println("stop loss at : " + stopLossPrice);
+=======
+			e.printStackTrace();
+			return false;
+		}
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 		request = new MarketOrderRequest()
 				.setUnits(units)
 				.setInstrument(instrument)
@@ -183,7 +250,10 @@ public class CopyTwitterStrategy {
 		if(sendOrder(request)) {
 			return true;
 		}
+<<<<<<< HEAD
 		SendReport.addError("the sendOrder() failed | MXInvestingTweet() | CopyTwitterStrategy " + tweet);
+=======
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 		return false;
 	}
 
@@ -194,15 +264,26 @@ public class CopyTwitterStrategy {
 	private static Boolean signalFactoryTweet(String tweet) {
 		String buyOrSell = null;
 		InstrumentName instrument = null;
+<<<<<<< HEAD
 		Double stopLossPrice = null;
 		Double takeProfitPrice = null;
 		Double units = null;
 		MarketOrderRequest request = null;
+=======
+		Double entryPrice = null;
+		Double stopLossPrice = null;
+		Double takeProfitPrice = null;
+		Double units = null;
+		OrderRequest request = null;
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 		Matcher matcher = SignalFactoryPattern.matcher(tweet);
 		
 		if(!verifySignalFactory(tweet)) {
 			System.out.println("Tweet is not valid");
+<<<<<<< HEAD
 			SendReport.addError("the tweet is not valid | signalFactoryTweet() | CopyTwitterStrategy " + tweet);
+=======
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 			return false;
 		}
 		try {
@@ -212,6 +293,10 @@ public class CopyTwitterStrategy {
 				instrument = new InstrumentName(instrumentRaw[0] + instrumentRaw[1] +
 						instrumentRaw[2] + "_" + instrumentRaw[3] + instrumentRaw[4]
 								+ instrumentRaw[5]);
+<<<<<<< HEAD
+=======
+				entryPrice = Double.parseDouble(matcher.group(7));
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 				stopLossPrice = Double.parseDouble(matcher.group(10));
 				takeProfitPrice = Double.parseDouble(matcher.group(13));
 				units = ConstantValues.getUnitsTraded() * 0.5;
@@ -220,12 +305,21 @@ public class CopyTwitterStrategy {
 				}
 			}
 		}catch(Exception e) {
+<<<<<<< HEAD
 			SendReport.addError(e.getMessage() + " " + tweet);
 			e.printStackTrace();
 		}
 		request = new MarketOrderRequest()
 				.setInstrument(instrument)
 				.setUnits(units)
+=======
+			e.printStackTrace();
+		}
+		request = new MarketIfTouchedOrderRequest()
+				.setInstrument(instrument)
+				.setUnits(units)
+				.setPrice(entryPrice)
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 				.setStopLossOnFill(new StopLossDetails()
 						.setPrice(stopLossPrice))
 				.setTakeProfitOnFill(new TakeProfitDetails()
@@ -233,8 +327,11 @@ public class CopyTwitterStrategy {
 		if(sendOrder(request)) {
 			return true;
 		}
+<<<<<<< HEAD
 		System.out.println("the sendOrder() failed | SignalFactoryTweet() | CopyTwitterStrategy " + tweet);
 		SendReport.addError("the sendOrder() failed | SignalFactoryTweet() | CopyTwitterStrategy " + tweet);
+=======
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 		return false;
 	}
 
@@ -275,6 +372,7 @@ public class CopyTwitterStrategy {
 			return false;
 		}
 	}
+<<<<<<< HEAD
 	
 	private static Double calculateTakeProfit(Double currentPrice, int timeFrame, InstrumentName instrumentName) throws RequestException, ExecuteException {
 		AccountInstrumentsRequest request = new AccountInstrumentsRequest(ConstantValues.getAccountId());
@@ -355,4 +453,6 @@ public class CopyTwitterStrategy {
 		}
 		return 0.0;
 	}
+=======
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 }

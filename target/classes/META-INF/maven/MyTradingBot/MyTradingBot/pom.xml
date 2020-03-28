@@ -18,15 +18,7 @@
 	</properties>
 
 	<dependencies>
-<<<<<<< HEAD
-		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-controls</artifactId>
-			<version>14</version>
-		</dependency>
-=======
 
->>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -43,14 +35,6 @@
 			<artifactId>v20</artifactId>
 			<version>3.0.25</version>
 		</dependency>
-<<<<<<< HEAD
-		<dependency>
-			<groupId>javax.mail</groupId>
-			<artifactId>mail</artifactId>
-			<version>1.4</version>
-		</dependency>
-=======
->>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
@@ -92,17 +76,6 @@
 				</configuration>
 			</plugin>
 			<plugin>
-<<<<<<< HEAD
-				<groupId>org.openjfx</groupId>
-				<artifactId>javafx-maven-plugin</artifactId>
-				<version>0.0.4</version>
-				<configuration>
-					<mainClass>MyTradingBot.Main</mainClass>
-				</configuration>
-			</plugin>
-			<plugin>
-=======
->>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
 					<archive>

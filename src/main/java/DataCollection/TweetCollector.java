@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+<<<<<<< HEAD
 import Documenting.SendReport;
+=======
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 import twitter4j.Query;
 import twitter4j.QueryResult;
 import twitter4j.Status;
@@ -50,7 +53,10 @@ public class TweetCollector {
 		try {
 			result = twitter.search(query);
 		} catch (TwitterException e) {
+<<<<<<< HEAD
 			SendReport.addError(e.getMessage());
+=======
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 			e.printStackTrace();
 		}
 		return result.getTweets();
@@ -59,14 +65,23 @@ public class TweetCollector {
 	/**
 	 * @return The tweets content along with some other data
 	 * */
+<<<<<<< HEAD
 	public ArrayList<String> getUserTimeLine() throws TwitterException {
+=======
+	public ArrayList<String> getUserTiemline() throws TwitterException {
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 		String result = "Null";
 		ArrayList<String> results = new ArrayList<String>();
 		List<Status> statuses = new ArrayList<Status>();
 		ArrayList<String> listOfUsers = new ArrayList<String>();
+<<<<<<< HEAD
 		//listOfUsers.add("@SignalFactory");
 		//listOfUsers.add("@MXInvesting");
 		listOfUsers.add("@EzpipsS");
+=======
+		listOfUsers.add("@SignalFactory");
+		listOfUsers.add("@MXInvesting");
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 		for(String userName : listOfUsers) {
 			try {
 				statuses = twitter.getUserTimeline(userName);
@@ -78,7 +93,10 @@ public class TweetCollector {
 					}
 				}
 			}catch(Exception e) {
+<<<<<<< HEAD
 				SendReport.addError(e.getMessage());
+=======
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 				System.out.println(e.toString() + " ff");
 				return null;
 			}

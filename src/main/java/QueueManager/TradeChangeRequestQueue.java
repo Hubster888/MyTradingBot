@@ -21,7 +21,10 @@ import com.oanda.v20.transaction.StopLossDetails;
 import com.oanda.v20.transaction.TakeProfitDetails;
 import com.oanda.v20.transaction.TransactionID;
 
+<<<<<<< HEAD
 import Documenting.SendReport;
+=======
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 import MyTradingBot.ConstantValues;
 
 /**

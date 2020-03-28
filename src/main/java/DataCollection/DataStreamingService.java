@@ -10,9 +10,12 @@ import java.util.List;
 
 import com.oanda.v20.primitives.InstrumentName;
 
+<<<<<<< HEAD
 import Documenting.SendReport;
 
 
+=======
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 /**
  * This class will be used to stream data from the oanada
  * market. It will mostly include prices of specified
@@ -24,12 +27,19 @@ public class DataStreamingService {
 	/**
 	 * Test the stream
 	 * */
+<<<<<<< HEAD
 	public static void main(String[] args) {
+=======
+	public static void main(String[] args) throws IOException {
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 		try {
 			List<InstrumentName> listOfInstruments = new ArrayList<InstrumentName>();
 			priceGETStream(listOfInstruments);
 		}catch(Exception e) {
+<<<<<<< HEAD
 			SendReport.addError(e.getMessage());
+=======
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 			System.out.println(e.getMessage());
 		}
 	}

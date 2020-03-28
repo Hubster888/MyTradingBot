@@ -3,6 +3,7 @@ package MyTradingBot;
 import com.oanda.v20.Context;
 import com.oanda.v20.ContextBuilder;
 import com.oanda.v20.account.AccountID;
+<<<<<<< HEAD
 import com.oanda.v20.transaction.TransactionID;
 
 public class ConstantValues {
@@ -10,10 +11,19 @@ public class ConstantValues {
 	private static String ACCESS_TOKEN = "dc2d5455f7afb93f08fdb9215d743d63-b71c4c121ffdfe94b8da839aec55e568";
 	private static AccountID ACCOUNT_ID = new AccountID("101-004-13661335-003");
 	private static Double STANDARD_UNITS_TRADED = 2000.0;
+=======
+
+public class ConstantValues {
+	private final static String URL = "https://api-fxpractice.oanda.com";
+	private final static String ACCESS_TOKEN = "dc2d5455f7afb93f08fdb9215d743d63-b71c4c121ffdfe94b8da839aec55e568";
+	private final static AccountID ACCOUNT_ID = new AccountID("101-004-13661335-003");
+	private final static Double STANDARD_UNITS_TRADED = 2000.0;
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 	private final static Context CTX = new ContextBuilder(URL)
     		.setToken(ACCESS_TOKEN)
     		.setApplication("MyTradingBot-1.jar")
     		.build();
+<<<<<<< HEAD
 	private static Double stopLoss1 = 0.0;
 	private static Double stopLoss2 = 0.0;
 	private static Double stopLoss3 = 0.0;
@@ -188,6 +198,22 @@ public class ConstantValues {
 	 * */
 	public static Double getBadMargin() {
 		return BAD_MARGIN;
+=======
+	private final static Double CANCEL_PERCENT_1H = 0.0095;
+	private final static Double CANCEL_PERCENT_4H = 0.012;
+	private final static Double CANCEL_PERCENT_5H = 0.013;
+	private final static Double CANCEL_PERCENT_1D = 0.025;
+	private final static Double MIN_BALANCE = 300.0;
+	private final static Double MAX_OPEN_TRADES = 15.0;
+	private final static Double MIN_MARGIN = 200.0;
+	
+	
+	/**
+	 * @return the percent used for 1H time frames
+	 * */
+	public static Double getCancelPercent1H() {
+		return CANCEL_PERCENT_1H;
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 	}
 	
 	/**
@@ -212,6 +238,23 @@ public class ConstantValues {
 	}
 	
 	/**
+<<<<<<< HEAD
+=======
+	 * @return the percent used for 1D time frames
+	 * */
+	public static Double getCancelPercent1D() {
+		return CANCEL_PERCENT_1D;
+	}
+	
+	/**
+	 * @return the percent used for 5H time frames
+	 * */
+	public static Double getCancelPercent5H() {
+		return CANCEL_PERCENT_5H;
+	}
+	
+	/**
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 	 * @return the url used
 	 * */
 	public static String getURL() {
@@ -219,6 +262,16 @@ public class ConstantValues {
 	}
 	
 	/**
+<<<<<<< HEAD
+=======
+	 * @return the percent used for 4H time frames
+	 * */
+	public static Double getCancelPercent4H() {
+		return CANCEL_PERCENT_4H;
+	}
+	
+	/**
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 	 * @return the requested context
 	 * */
 	public static Context getCtx() {
@@ -245,6 +298,9 @@ public class ConstantValues {
 	public static Double getUnitsTraded() {
 		return STANDARD_UNITS_TRADED;
 	}
+<<<<<<< HEAD
 	
 	
+=======
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 }

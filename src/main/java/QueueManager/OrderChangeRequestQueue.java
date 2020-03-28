@@ -19,9 +19,16 @@ import com.oanda.v20.order.OrderReplaceResponse;
 import com.oanda.v20.order.OrderRequest;
 import com.oanda.v20.order.OrderSpecifier;
 import com.oanda.v20.trade.Trade;
+<<<<<<< HEAD
 import com.oanda.v20.transaction.TransactionID;
 
 import Documenting.SendReport;
+=======
+import com.oanda.v20.trade.TradeContext;
+import com.oanda.v20.trade.TradeSpecifier;
+import com.oanda.v20.transaction.TransactionID;
+
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 import MyTradingBot.ConstantValues;
 
 /**
@@ -39,7 +46,11 @@ public class OrderChangeRequestQueue {
 			.setToken(accessToken)
 			.setApplication("MyTradingBot")
 			.build();
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 	/**
 	 * An empty constructor
 	 * */
@@ -69,6 +80,15 @@ public class OrderChangeRequestQueue {
 			OrderReplaceResponse response = ctx.order.replace(replaceRequest);
 			TransactionID transactionId = response.getLastTransactionID();
 			if(isEmpty() /*TODO OrderManager.getLatestID == transactionId*/) {
+<<<<<<< HEAD
+=======
+				try {
+					addToLog(transactionId);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 				sendNotification(transactionId);
 				return true;
 			}else {
@@ -93,6 +113,22 @@ public class OrderChangeRequestQueue {
 		}
 	}
 
+<<<<<<< HEAD
+=======
+	/**
+	 * @param the transactionId of the change
+	 * @throws ExecuteException 
+	 * @throws RequestException 
+	 * @throws IOException 
+	 * */
+	private void addToLog(TransactionID transactionId) throws RequestException, ExecuteException, IOException {
+		TradeContext context = new TradeContext(ConstantValues.getCtx());
+		TradeSpecifier specifier = new TradeSpecifier(transactionId);
+		Trade summary = context.get(ConstantValues.getAccountId(), specifier).getTrade();
+		recordClosedTrade(summary);
+	}
+
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 	/**
 	 * @param the transactionId of the change
 	 * */
@@ -123,7 +159,10 @@ public class OrderChangeRequestQueue {
 			fr.write(trade.toString() + "\n");
 			fr.close();
 		} catch (IOException e) {
+<<<<<<< HEAD
 			SendReport.addError(e.getMessage());
+=======
+>>>>>>> f1b2841be7f2b9e53df341f8b1d02d3453b75bb7
 			e.printStackTrace();
 		}
 	}
