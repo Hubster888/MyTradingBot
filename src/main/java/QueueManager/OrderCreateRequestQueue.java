@@ -1,5 +1,6 @@
 package QueueManager;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -94,20 +95,20 @@ public class OrderCreateRequestQueue {
 				if(isSafeToOrder()) {
 					OrderCreateRequest createRequest = new OrderCreateRequest(accountId)
 							.setOrder(requestedOrder);
-					if(!orderIsNotRepeated(requestedOrder)) {SendReport.addError("Order is repeated : " + createRequest.toString());;return false;}
-					@SuppressWarnings("unused")
 					OrderCreateResponse response = ctx.order.create(createRequest);
+					SendReport.addOrderCreated(response.toString());
+					return true;
 				}else {
-					SendReport.addError("it is not safe to order | executeRequest() | OrderCreateRequestQueue");
 					return false;
 				}
 			}catch(Exception e) {
-				SendReport.addError(e.getMessage());
+				SendReport.addError(e.getMessage() + " " + new Date());
 				e.printStackTrace();
+				return false;
 			}
-			return false;
 		}else { // If the order parameters are not valid, send a signal that the order is not added.
-			SendReport.addError("the request is not valid | executeRequest() | OrderCreateRequestQueue");
+			System.out.println("the request is not valid | executeRequest() | OrderCreateRequestQueue " + requestedOrder.toString());
+			SendReport.addError("the request is not valid | executeRequest() | OrderCreateRequestQueue " + requestedOrder.toString());
 			return false;
 		}
 	}
@@ -128,12 +129,15 @@ public class OrderCreateRequestQueue {
 		Double marginAvaliable = response.getAccount().getMarginAvailable().doubleValue();
 		Boolean marginIsFine = marginAvaliable > ConstantValues.getMinMargin();
 		Boolean marginIsVeryBad = marginAvaliable < ConstantValues.getBadMargin();
+		Boolean marginRateIsGood = response.getAccount().getMarginRate().doubleValue() <  0.4;
 		if(marginIsVeryBad || !balanceIsCorrect) {
 			emergencyExit(response);
 		}
-		if(balanceIsCorrect && notTooManyTrades && marginIsFine) {
+		if(balanceIsCorrect && notTooManyTrades && marginIsFine && marginRateIsGood) {
 			return true;
 		}
+		System.out.println("it is not safe to order | OrderCreateRequestQueue numOfTrades: " + openTrades);
+		SendReport.addError("it is not safe to order | OrderCreateRequestQueue numOfTrades: " + openTrades);
 		return false;
 	}
 	
@@ -171,6 +175,7 @@ public class OrderCreateRequestQueue {
 	 * @param the order request to be executed
 	 * @return true if the order is fine to continue
 	 * */
+	@SuppressWarnings("unused")
 	private Boolean orderIsNotRepeated(OrderRequest request) {
 		OrderType orderType = request.getType();
 		AccountChangesRequest accountRequest = new AccountChangesRequest(ConstantValues.getAccountId()).setSinceTransactionID(ConstantValues.getLatestTransactionID());
@@ -178,7 +183,7 @@ public class OrderCreateRequestQueue {
 		try {
 			accountResponse = ConstantValues.getCtx().account.changes(accountRequest);
 		} catch (RequestException | ExecuteException e) {
-			SendReport.addError(e.getMessage());
+			SendReport.addError(e.getMessage() + " " + new Date());
 			e.printStackTrace();
 			return false;
 		}
@@ -188,11 +193,12 @@ public class OrderCreateRequestQueue {
 			List<Position> listOfOpenPositions = accountResponse.getChanges().getPositions();
 			for(Position position : listOfOpenPositions) {
 				if(position.getInstrument().equals(instrument)) {
-					SendReport.addError("The order instrument already exists in an open position");
-					return false;
+					SendReport.addError("The order instrument already exists in an open position: " );
+					//return false;
 				}
 			}
 		}else if(orderType.equals(OrderType.LIMIT)) {
+			
 			InstrumentName instrument = ((LimitOrderRequest) request).getInstrument(); 
 			AccountContext accountCTX = new AccountContext(ConstantValues.getCtx());
 			List<Order> listOfOrders = null;
@@ -208,7 +214,7 @@ public class OrderCreateRequestQueue {
 					LimitOrder limitOrder = (LimitOrder) order;
 					if(!limitOrder.getInstrument().equals(instrument)) {
 						SendReport.addError("The order already exists in the pending orders list");
-						return false;
+						//return false;
 					}
 				}
 			}

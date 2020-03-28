@@ -59,13 +59,14 @@ public class TweetCollector {
 	/**
 	 * @return The tweets content along with some other data
 	 * */
-	public ArrayList<String> getUserTiemline() throws TwitterException {
+	public ArrayList<String> getUserTimeLine() throws TwitterException {
 		String result = "Null";
 		ArrayList<String> results = new ArrayList<String>();
 		List<Status> statuses = new ArrayList<Status>();
 		ArrayList<String> listOfUsers = new ArrayList<String>();
-		listOfUsers.add("@SignalFactory");
-		listOfUsers.add("@MXInvesting");
+		//listOfUsers.add("@SignalFactory");
+		//listOfUsers.add("@MXInvesting");
+		listOfUsers.add("@EzpipsS");
 		for(String userName : listOfUsers) {
 			try {
 				statuses = twitter.getUserTimeline(userName);

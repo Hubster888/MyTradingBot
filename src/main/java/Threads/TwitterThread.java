@@ -8,6 +8,7 @@ import java.util.Date;
 
 import DataCollection.TweetCollector;
 import Documenting.SendReport;
+import MyTradingBot.Main;
 import Strategies.CopyTwitterStrategy;
 
 /**
@@ -24,17 +25,19 @@ public class TwitterThread extends Thread {
 			TweetCollector tweetCollector = new TweetCollector();
 			tweetCollector.setSince(new Date());
 			while(true) {
-				ArrayList<String> results = tweetCollector.getUserTiemline();
-				tweetCollector.setSince(new Date());
-				System.out.println("Number of new tweets: " + results.size());
-				for(String result : results) {
-					if(!result.equals("Null")) {
-						SendReport.addTweetRecived();
-						recordTweetRecived(result);
-						CopyTwitterStrategy.getQueue().add(result);
+				while(Main.getIsOn()) {
+					ArrayList<String> results = tweetCollector.getUserTimeLine();
+					tweetCollector.setSince(new Date());
+					System.out.println("Number of new tweets: " + results.size());
+					for(String result : results) {
+						if(!result.equals("Null")) {
+							SendReport.addTweetRecived();
+							recordTweetRecived(result);
+							CopyTwitterStrategy.getQueue().add(result);
+						}
 					}
+					Thread.sleep(60000);
 				}
-				Thread.sleep(60005);
 			}
 		}catch(Exception e) {
 			SendReport.addError(e.getMessage());

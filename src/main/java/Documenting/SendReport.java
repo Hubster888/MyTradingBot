@@ -29,11 +29,11 @@ public class SendReport extends TimerTask {
 	private static int numOfTweetsRecived;
 	private static int numOfTradesOpened;
 	private static int numOfTradesClosed;
-	private static Double NAVAtStartOfDay;
 	private static List<FailedTweet> listOfFailedTweets;
 	private static List<TradeSummary> listOfClosedTrades = new LinkedList<TradeSummary>();
 	private static TransactionID startOfDayID;
-	private static List<String> listOfErrors;
+	private static List<String> listOfErrors = new LinkedList<String>();
+	private static List<String> listOfOrdersCreated = new LinkedList<String>();
 	
 	public SendReport(AccountGetResponse response, int numOfTweetsRecived, int numOfTradesOpened, int numOfTradesClosed,
 			Double NAVAtStartOfDay, List<FailedTweet> listOfFailedTweets, List<String> listOfErrors, TransactionID startOfDayID) {
@@ -41,16 +41,17 @@ public class SendReport extends TimerTask {
 		SendReport.numOfTweetsRecived = numOfTweetsRecived;
 		SendReport.numOfTradesOpened = numOfTradesOpened;
 		SendReport.numOfTradesClosed = numOfTradesClosed;
-		SendReport.NAVAtStartOfDay = NAVAtStartOfDay;
-		SendReport.listOfFailedTweets = listOfFailedTweets;
+		SendReport.listOfFailedTweets = getListOfFailedTweets();
 		SendReport.listOfErrors = getListOfErrors();
 		SendReport.startOfDayID = startOfDayID;
+		SendReport.listOfOrdersCreated = getListOfOrdersCreated();
 	}
 	
 	public SendReport() {}
 	
 	private static void sendReport(){
 		SendReport.listOfErrors = getListOfErrors();
+		SendReport.listOfOrdersCreated = getListOfOrdersCreated();
 		AccountChangesRequest accountRequest = new AccountChangesRequest(ConstantValues.getAccountId()).setSinceTransactionID(startOfDayID);
 		AccountChangesResponse accountResponse = null;
 		try {
@@ -68,7 +69,6 @@ public class SendReport extends TimerTask {
 				numOfTradesWithProfit++;
 			}
 		}
-		Double NAVAtEndOfTheDay = response.getAccount().getNAV().doubleValue();
 		Double successRate = ((double)numOfTradesWithProfit) / numOfTradesClosed;
 		StringBuilder title = new StringBuilder();
 		title.append("The report for trading bot");
@@ -77,22 +77,25 @@ public class SendReport extends TimerTask {
 		stats.append("\n Number of tweets recived: " + numOfTweetsRecived + "\n" +
 		        "Number of trades created: " + numOfTradesOpened + "\n" +
 				"Number of trades closed: " + numOfTradesClosed + "\n" +
-		        "The profit/loss: " + (NAVAtStartOfDay - NAVAtEndOfTheDay) + "\n" +
 				"The success rate: " + (successRate * 100) + "\n" +
 		        "Number of orders cancelled: " + numOfOrdersCancelled);
 		
-		StringBuilder failedTweets = new StringBuilder();
-		failedTweets.append("\n" + "Failed Tweets" + "\n");
-		for(FailedTweet failedTweet : listOfFailedTweets) {
-			failedTweets.append(new Date() + " " + failedTweet.FailedTweetToString() + "\n");
-		}
-		
 		StringBuilder errors = new StringBuilder();
+		errors.append("List of errors--------------------------------------------------------- \n");
 		if(listOfErrors != null) {
 			for(String error : listOfErrors) {
 				errors.append(error + "\n");
 			}
 		}
+		
+		StringBuilder ordersCreated = new StringBuilder();
+		ordersCreated.append("Orders Created ------------------------------------");
+		if(listOfOrdersCreated != null) {
+			for(String order : listOfOrdersCreated) {
+				ordersCreated.append(order);
+			}
+		}
+		
 		
 		
 		StringBuilder closedTrades = new StringBuilder();
@@ -104,8 +107,8 @@ public class SendReport extends TimerTask {
 		StringBuilder mainMessage = new StringBuilder();
 		mainMessage.append(title);
 		mainMessage.append(stats);
-		mainMessage.append(failedTweets);
 		mainMessage.append(errors);
+		mainMessage.append(ordersCreated);
 		final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
 		  // Get a Properties object
 		     Properties props = System.getProperties();
@@ -146,7 +149,6 @@ public class SendReport extends TimerTask {
 		     numOfTweetsRecived = 0;
 		     numOfTradesOpened = 0;
 		     numOfTradesClosed = 0;
-		     NAVAtStartOfDay = response.getAccount().getNAV().doubleValue();
 		     listOfFailedTweets = new LinkedList<FailedTweet>();
 		     listOfErrors = new LinkedList<String>();
 		     startOfDayID = response.getAccount().getLastTransactionID();
@@ -195,5 +197,16 @@ public class SendReport extends TimerTask {
 	public static List<String> getListOfErrors(){
 		return listOfErrors;
 	}
-
+	
+	public static List<String> getListOfOrdersCreated(){
+		return listOfOrdersCreated;
+	}
+	
+	public static void addOrderCreated(String order) {
+		listOfOrdersCreated.add(order);
+	}
+	
+	public static List<FailedTweet> getListOfFailedTweets(){
+		return listOfFailedTweets;
+	}
 }
